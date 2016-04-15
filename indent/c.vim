@@ -1,0 +1,1 @@
+setlocal cinoptions-=h1
