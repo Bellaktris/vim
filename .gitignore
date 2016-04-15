@@ -1,0 +1,14 @@
+vimrcs/plugins/__pycache__/*
+*.pyc
+
+tempd/*
+*/doc/tags
+plugged/*
+thirdparty/*
+
+plugin/secret.vim
+vimrc/secret.vim
+after/plugin/secret.vim
+
+# I will update it manually
+autoload/plug.vim
