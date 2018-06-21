@@ -17,23 +17,23 @@ if exists('t_8b')
   let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 endif
 
-set termguicolors
-" if (has('nvim') || v:version >= 742)
-"   if $TERM_PROGRAM == 'iTerm.app'
-"     set termguicolors
-"   else
-"     if $SSH_TTY != '' && !executable('xset')
-"       set notermguicolors
-"     else
-"       call system('xset q &>/dev/null')
-"       if v:shell_error == 0
-"         set termguicolors
-"       else
-"         set notermguicolors
-"       endif  " v:shell_error == 0
-"     endif  " $SSH_TTY == ''
-"   endif
-" endif  " (has('nvim') || v:version >= 742)
+if (has('nvim') || v:version >= 742)
+  if $TERM_PROGRAM == 'iTerm.app'
+    set termguicolors
+  else
+    " mosh doesn't support true color yet...
+    if $SSH_TTY != '' && !executable('xset')
+      set notermguicolors
+    else
+      call system('xset q &>/dev/null')
+      if v:shell_error == 0
+        set termguicolors
+      else
+        set notermguicolors
+      endif  " v:shell_error == 0
+    endif  " $SSH_TTY == ''
+  endif
+endif  " (has('nvim') || v:version >= 742)
 
 if has('nvim-0.2')
   set guicursor=
@@ -94,8 +94,7 @@ call plug#begin(g:vim_plug_dir)
 
 " Fixes for vim strange behaviour                                          {{{
   Plug 'https://github.com/svermeulen/vim-easyclip'
-  Plug 'https://github.com/Konfekt/vim-alias',
-    \ { 'on': 'Alias' }
+  Plug 'https://github.com/Konfekt/vim-alias'
 
   Plug 'https://github.com/Konfekt/FastFold'
   Plug 'https://github.com/kopischke/vim-stay'
@@ -131,15 +130,17 @@ call plug#begin(g:vim_plug_dir)
   if executable('go') | let s:ycm_install .= ' --gocode-completer' | endif
   if executable('node') | let s:ycm_install .= ' --tern-completer' | endif
 
-  execute "Plug 'https://github.com/Valloric/YouCompleteMe', "
-    \. "{ 'do': " . s:ycm_install . "' }"
+  if v:version >= 742
+    execute "Plug 'https://github.com/Valloric/YouCompleteMe', "
+      \. "{ 'do': " . s:ycm_install . "' }"
 
-  Plug 'https://github.com/rdnetto/YCM-Generator',
-    \ { 'on': 'YcmGenerateConfig', 'branch': 'stable' }
+    Plug 'https://github.com/rdnetto/YCM-Generator',
+      \ { 'on': 'YcmGenerateConfig', 'branch': 'stable' }
 
-  augroup YCMAugroup | au!
-    au VimEnter * call youcompleteme#Enable() | au! YCMAugroup
-  augroup END
+    augroup YCMAugroup | au!
+      au VimEnter * call youcompleteme#Enable() | au! YCMAugroup
+    augroup END
+  endif
 " }}}
 
 " Utility                                                                  {{{

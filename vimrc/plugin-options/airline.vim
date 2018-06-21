@@ -23,5 +23,7 @@ let g:airline#extensions#tabline#show_splits = 0
 
 let g:airline#extensions#tabline#fnametruncate = 7
 let g:airline#extensions#tabline#fnamemod = ':t'
+let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
+
 
 let g:airline_extensions = ['tabline', 'branch', 'tagbar', 'ycm']

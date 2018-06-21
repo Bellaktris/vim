@@ -1,4 +1,8 @@
-let &clipboard="unnamed"
+if $SSH_TTY != ''
+  let &clipboard=""
+else
+  let &clipboard="unnamed"
+endif
 
 let g:EasyClipUseYankDefaults = 0
 let g:EasyClipUseCutDefaults = 0

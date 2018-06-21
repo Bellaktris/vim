@@ -4,10 +4,10 @@ let g:grepper = {
     \ 'git':           { 'grepprg':    'git grep -nI -i --fixed-strings'
                           \.' --ignore-case --exclude-standard --untracked ' },
     \
-    \ 'ag':            { 'grepprg':    'ag --vimgrep'
+    \ 'ag':            { 'grepprg':    'ag --vimgrep --silent'
                               \.' --smart-case --hidden --fixed-strings -- ' },
     \
-    \ 'rg':            { 'grepprg':    'rg -H --no-heading --vimgrep'
+    \ 'rg':            { 'grepprg':    'rg -H --no-heading --vimgrep --no-messages'
                               \.' --smart-case --hidden --fixed-strings -- ' },
 \}
 

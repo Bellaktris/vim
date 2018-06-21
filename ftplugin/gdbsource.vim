@@ -41,11 +41,21 @@ let b:last_goto = -1
 
 function! OnChange(args)
   if &ft[:8] == 'gdbsource' && filereadable(expand('%:p') . '.data')
+    let b:prev_data = []
+
+    if exists('b:data')
+      let b:prev_data = deepcopy(b:data)
+    endif
+
     let b:data = readfile(expand('%:p') . '.data')
 
     if len(b:data) == 0
       return
     endif
+
+    " if b:data == b:prev_data
+    "   return
+    " endif
 
     doautocmd FocusGained
 
@@ -54,10 +64,10 @@ function! OnChange(args)
     if b:data[0] != b:last_goto | call GotoCurrentLine() | endif
   endif
 
-  let b:timer = timer_start(80, function('OnChange'))
+  let b:timer = timer_start(400, function('OnChange'))
 endfunction
 
-let b:timer = timer_start(80, function('OnChange'))
+let b:timer = timer_start(400, function('OnChange'))
 
 nmap <silent><buffer> <leader>ln :call GotoCurrentLine()<cr>
 
@@ -67,14 +77,16 @@ set laststatus=0 | set colorcolumn=
 sign define current_line text=⟹  texthl=NeomakeWarningSign
 sign define breakpoint text=▪  texthl=NeomakeInfoSign
 
+let g:gdb_pane_id = $GDBSOURCE_PANE_ID
+
 function! TmuxDo(s, redraw_opt)
-  call system("tmux send-keys -t 1 '" . a:s . "'; tmux send-keys -t 1 Enter")
+  call system("tmux send-keys -t " . g:gdb_pane_id . " '" . a:s . "'; tmux send-keys -t 0 Enter")
 
   if a:redraw_opt == 1
-    call system("tmux send-keys -t 1 'dashboard'; tmux send-keys -t 1 Enter")
+    call system("tmux send-keys -t " . g:gdb_pane_id . " 'dashboard'; tmux send-keys -t 0 Enter")
   endif
 
-  " call system("tmux send-keys -t 1 'shell clear'; tmux send-keys -t 1 Enter")
+  " call system("tmux send-keys -t 0 'shell clear'; tmux send-keys -t 0 Enter")
   return "\<esc>"
 endfunction
 
@@ -92,12 +104,12 @@ function! GetBreakCMD()
   return 'quiet break'
 endfunction
 
-noremap <silent><buffer><expr> <F10> TmuxDo('quiet next', 0)
-noremap <silent><buffer><expr> <F12> TmuxDo('quiet step', 0)
-noremap <silent><buffer><expr> <F5> TmuxDo('quiet continue', 0)
-noremap <silent><buffer><expr> <S-F5> TmuxDo('quiet start', 0)
+noremap <silent><buffer><expr> <leader>nt TmuxDo('quiet next', 0)
+noremap <silent><buffer><expr> <leader>st TmuxDo('quiet step', 0)
+noremap <silent><buffer><expr> <leader>ct TmuxDo('quiet continue', 0)
+noremap <silent><buffer><expr> <leader>rn TmuxDo('quiet start', 0)
 
-noremap <silent><buffer><expr> <F9> TmuxDo(GetBreakCMD() . " ". line('.'), 1)
+noremap <silent><buffer><expr> <leader>bp TmuxDo(GetBreakCMD() . " ". line('.'), 1)
 
 let prefixes = [
       \'q', 'qu', 'qui', 'quit', 'quita', 'quital',

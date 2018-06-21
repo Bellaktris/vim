@@ -48,7 +48,7 @@ if !filereadable(g:temp_dir . '/tmpfile')
 endif
 
 if exists(':Alias')
-  Alias tmpfile Tmpfile
+  call CmdAlias('tmpfile', 'Tmpfile')
 endif
 
 " autoclose helper windows
@@ -85,8 +85,11 @@ augroup END
 
 
 " clipboard copy/paste
-set clipboard=unnamed,unnamedplus
-
+if $SSH_TTY != ""
+  set clipboard=""
+else
+  set clipboard=unnamed,unnamedplus
+endif
 
 " use Unix as the standard file type
 set ffs=unix,dos,mac
@@ -208,7 +211,6 @@ set splitright
 set hlsearch
 set incsearch
 set nomagic
-set langnoremap
 set laststatus=2
 set mouse=n
 set nrformats=hex
@@ -228,6 +230,10 @@ set shiftwidth=2
 set nowrap
 set nolinebreak
 set viewoptions=cursor,folds,slash,unix
+
+if exists('&langremap')
+  set nolangremap
+endif
 
 if exists('&inccommand')
   set inccommand=split

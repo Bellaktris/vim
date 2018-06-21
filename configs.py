@@ -22,6 +22,14 @@ if !exists('g:root_dir')
   let g:temp_dir = "''' + TEMPDIR + r'''"
   let g:snippet_dir = "''' + SNIPPETDIR + r'''"
 
+  if !isdirectory(g:temp_dir)
+      execute 'silent !mkdir -p ' . g:temp_dir
+  endif
+
+  if !isdirectory($HOME + '/.vim')
+      execute 'silent !mkdir -p ' . $HOME . '/.vim'
+  endif
+
   let g:root_dir = "''' + ROOTDIR + r'''"
   let g:vim_plug_dir = g:root_dir . '/thirdparty'
 

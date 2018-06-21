@@ -22,5 +22,5 @@ command! -nargs=* -bang BMake
           \| silent! Make<bang> <args>
 
 if exists(':Alias')
-  Alias make BMake
+  call CmdAlias('make', 'BMake')
 endif

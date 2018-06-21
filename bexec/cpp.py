@@ -68,7 +68,8 @@ for target in [mode]:
 
         if file_not_exists or creation_time > mtime(binary_path):
             arglist = ['clang++', '-Wall', '-std=c++1z',
-                       '-I/usr/include/eigen3',
+                       '-I/usr/local/include/eigen3',
+                       '-Wno-invalid-partial-specialization',
                        '-I' + os.path.expanduser('~/.files/c++/include')]
             arglist = arglist + compile_flags
             arglist = arglist + [source_file, '-o', binary_path]

@@ -2,8 +2,8 @@ let g:viewdoc_openempty = 0
 let g:no_plugin_maps = 1
 
 if exists(':Alias')
-  Alias help ViewDocHelp
-  Alias man  ViewDocMan
+  call CmdAlias('help', 'ViewDocHelp')
+  call CmdAlias('man', 'ViewDocMan')
 endif
 
 nnoremap <silent> K :ViewDoc <cword><cr>

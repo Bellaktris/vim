@@ -171,10 +171,19 @@ nmap <leader>xx <plug>(execute-file)
 nmap <leader>vx <plug>(view-file)
 nmap <leader>le <plug>(view-compilation-status)
 
-noremap <silent> <leader>ip :execute helpers#free_hspace()
-      \ . 'vsplit term://ptipython3<cr>
-execute 'noremap <silent> <leader>sh :execute helpers#free_hspace() ' .
-      \'. "vsplit term://" . &shell<cr>'
+if empty($TMUX)
+  noremap <silent> <leader>ip :execute helpers#free_hspace()
+        \ . 'vsplit term://ptipython3'<cr>
+
+  execute 'noremap <silent> <leader>sh :execute helpers#free_hspace() ' .
+        \'. "vsplit term://" . &shell<cr>'
+else
+  noremap <silent> <leader>ip :call system(
+        \ 'tmux split -h -l ' . helpers#free_hspace() . ' ptipython3')<cr>
+
+  noremap <silent> <leader>sh :call system(
+        \ 'tmux split -h -l ' . helpers#free_hspace())<cr>
+endif
 
 let g:state="code"
 function! ChangeState()

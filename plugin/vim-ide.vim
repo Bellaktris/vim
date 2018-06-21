@@ -33,17 +33,17 @@ autocmd! BufLeave,BufWrite */ide-cpp-stdargs call CCargsRead()
 
 command! Release call s:ReleaseFunc()
 if exists(':Alias')
-    Alias release Release
+    call CmdAlias('release', 'Release')
 endif
 
 command! Debug call s:DebugFunc()
 if exists(':Alias')
-    Alias debug Debug
+    call CmdAlias('debug', 'Debug')
 endif
 
 command! -nargs=1 Timeout call s:TimeoutFunc(<f-args>)
 if exists(':Alias')
-    Alias timeout Timeout
+    call CmdAlias('timeout', 'Timeout')
 endif
 
 function! s:ReleaseFunc(...)
@@ -67,7 +67,7 @@ endfunction
 
 command! -nargs=? Stdin call s:StdinFunc(<f-args>)
 if exists(':Alias')
-    Alias stdin Stdin
+    call CmdAlias('stdin', 'Stdin')
 endif
 
 function! s:StdinFunc(...)
@@ -81,7 +81,7 @@ endfunction
 
 command! -nargs=? Stdargs call s:StdargsFunc(<f-args>)
 if exists(':Alias')
-    Alias stdargs Stdargs
+    call CmdAlias('stdargs', 'Stdargs')
 endif
 
 function! UpdateStdargs()
@@ -99,7 +99,7 @@ endfunction
 
 command! -nargs=? CCargs call s:CCargsFunc(<f-args>)
 if exists(':Alias')
-    Alias ccargs CCargs
+    call CmdAlias('ccargs', 'CCargs')
 endif
 
 function! CCargsRead()

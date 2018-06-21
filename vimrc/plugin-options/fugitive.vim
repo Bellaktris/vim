@@ -1,34 +1,34 @@
 if exists(':Alias')
   command! -nargs=*       GitStatus exec 'lcd '.helpers#find_git_root() | Gstatus <args>
-  Alias gstatus GitStatus
+  call CmdAlias('gstatus', 'GitStatus')
 
   command! -nargs=*       Gdiff    exec 'lcd '.helpers#find_git_root() | Gdiff <args>
-  Alias gdiff Gdiff
+  call CmdAlias('gdiff', 'Gdiff')
 
   command! -nargs=*       GitCommit exec 'lcd '.helpers#find_git_root() | Gcommit <args>
-  Alias gcommit GitCommit
+  call CmdAlias('gcommit', 'GitCommit')
 
   command! -nargs=*       GitWrite  exec 'lcd '.helpers#find_git_root() | Gwrite <args>
-  Alias gwrite GitWrite
+  call CmdAlias('gwrite', 'GitWrite')
 
   command! -nargs=* -bang GitMain   exec 'lcd '.helpers#find_git_root() | Git<bang> <args>
-  Alias git GitMain
+  call CmdAlias('git', 'GitMain')
 
   command! -nargs=*       GitCd     exec 'lcd '.helpers#find_git_root() | Gcd <args>
-  Alias gcd GitCd
+  call CmdAlias('gcd', 'GitCd')
 
   command! -nargs=*       GitLCd    exec 'lcd '.helpers#find_git_root() | Glcd <args>
-  Alias glcd GitLCd
+  call CmdAlias('glcd', 'GitLCd')
 
   command! -nargs=* -bang GitGrep   exec 'lcd '.helpers#find_git_root() | Ggrep<bang> <args>
-  Alias ggrep GitGrep
+  call CmdAlias('ggrep', 'GitGrep')
 
   command! -nargs=*       GitLog    exec 'lcd '.helpers#find_git_root() | Glog <args>
-  Alias glog GitLog
+  call CmdAlias('glog', 'GitLog')
 
   command! -nargs=*       GitPush   exec 'lcd '.helpers#find_git_root() | Gpush <args>
-  Alias gpush GitPush
+  call CmdAlias('gpush', 'GitPush')
 
   command! -nargs=*       GitPull   exec 'lcd '.helpers#find_git_root() | Gpull <args>
-  Alias gpull GitPull
+  call CmdAlias('gpull', 'GitPull')
 endif
