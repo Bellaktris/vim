@@ -96,6 +96,8 @@ call plug#begin(g:vim_plug_dir)
   Plug 'https://github.com/svermeulen/vim-easyclip'
   Plug 'https://github.com/Konfekt/vim-alias'
 
+  silent! call plug#load('vim-alias')
+
   Plug 'https://github.com/Konfekt/FastFold'
   Plug 'https://github.com/kopischke/vim-stay'
 
@@ -137,9 +139,11 @@ call plug#begin(g:vim_plug_dir)
     Plug 'https://github.com/rdnetto/YCM-Generator',
       \ { 'on': 'YcmGenerateConfig', 'branch': 'stable' }
 
-    augroup YCMAugroup | au!
-      au VimEnter * call youcompleteme#Enable() | au! YCMAugroup
-    augroup END
+    if exists(':YcmDebugInfo')
+      augroup YCMAugroup | au!
+        au VimEnter * call youcompleteme#Enable() | au! YCMAugroup
+      augroup END
+    endif " exists(':YcmDebugInfo')
   endif
 " }}}
 

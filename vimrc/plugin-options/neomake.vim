@@ -155,4 +155,26 @@ if has('nvim')
 
     let g:neomake_python_enabled_makers = ['flake8', 'pylint']
     " }}}
+
+    " Hack/PHP {{{
+    if executable('hh_client')
+        let g:neomake_php_hh_client_maker = {
+            \ 'exe': 'hh_client',
+            \ 'args': [
+                  \ '--from', 'vim',
+                  \ '--retries', '1',
+                  \ '--retry-if-init', 'false'
+            \ ],
+            \ 'errorformat':
+                \  '%EFile "%f"\, line %l\, characters %c-%.%#,%Z%m,'
+                \ .'Error: %m,',
+            \ 'postprocess': {
+                \  entry -> entry.text =~# "([A-Z][a-z][a-z]*\[[0-9]*\])$"
+                    \  ? entry : extend(entry, {'valid': -1})
+            \  },
+        \ }
+
+        let g:neomake_php_enabled_makers = ['hh_client']
+    endif
+    " }}}
 endif
