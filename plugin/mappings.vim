@@ -121,44 +121,26 @@ noremap <silent> <leader>tb :let g:tagbar_width=helpers#free_hspace()<cr>:Tagbar
 nmap <silent> <leader>gt :Windows<cr>
 nmap <silent> <leader>cp :call helpers#call_from_git_root('FZF')<cr>
 
-if executable('rg')
-    xmap <silent> <leader>ag y:execute "lcd ".helpers#find_git_root()<cr>
-          \ :exe "Grepper -query "
-          \ . helpers#shellescape(substitute(@0, '--', '', 'g'))<cr>
-    xmap <silent> <leader>gp y:execute "lcd ".helpers#find_first_root()<cr>
-          \ :exe "Grepper -query "
-          \ . helpers#shellescape(substitute(@0, '--', '', 'g'))<cr>
-elseif executable('ag')
-    xmap <silent> <leader>ag y:execute "lcd ".helpers#find_git_root()<cr>
-          \ :exe "Grepper -query "
-          \ . helpers#shellescape(substitute(@0, '--', '', 'g'))<cr>
-    xmap <silent> <leader>gp y:execute "lcd ".helpers#find_first_root()<cr>
-          \ :exe "Grepper -query "
-          \ . helpers#shellescape(substitute(@0, '--', '', 'g'))<cr>
+if executable('rg') || executable('ag')
+  let g:grep_opts = ''
 elseif executable('git')
-    xmap <silent> <leader>ag y:execute "lcd ".helpers#find_git_root()<cr>
-          \ :exe "Grepper -query -F " . helpers#shellescape(@0)<cr>
-    xmap <silent> <leader>gp y:execute "lcd ".helpers#find_first_root()<cr>
-          \ :exe "Grepper -query -F " . helpers#shellescape(@0)<cr>
+  let g:grep_opts = '-F'
 elseif executable('ack')
-    xmap <silent> <leader>ag y:execute "lcd ".helpers#find_git_root()<cr>
-          \ :exe "Grepper -query -Q " . helpers#shellescape(@0)<cr>
-    xmap <silent> <leader>gp y:execute "lcd ".helpers#find_first_root()<cr>
-          \ :exe "Grepper -query -Q " . helpers#shellescape(@0)<cr>
+  let g:grep_opts = '-Q'
 else
-    xmap <silent> <leader>ag y:execute "lcd ".helpers#find_git_root()<cr>
-          \ :exe "Grepper -query " . helpers#shellescape(@0)<cr>
-    xmap <silent> <leader>gp y:execute "lcd ".helpers#find_first_root()<cr>
-          \ :exe "Grepper -query " . helpers#shellescape(@0)<cr>
+  let g:grep_opts = ''
 endif
 
-exec "nmap <leader>gp :execute 'lcd '.helpers#find_first_root()<cr>:FastGrep "
-exec "nmap <leader>ag :execute 'lcd '.helpers#find_git_root()<cr>:FastGrep "
+xmap <silent> <leader>ag y:call FastGrepFirstRoot(substitute(@0, '--', '', 'g'), g:grep_opts)<cr>
+xmap <silent> <leader>gp y:call FastGrepLastRoot(substitute(@0, '--', '', 'g'), g:grep_opts)<cr>
+
+exec "nmap <leader>ag :FastGrepU "
+exec "nmap <leader>gp :FastGrepL "
 
 nnoremap <silent> <leader>en :call EnMasse()<cr>
 
 noremap <leader>cd :cd %:p:h<cr>:pwd<cr>
-noremap <silent> <leader>te :call helpers#call_from_first_root_dir('FZF')<cr>
+noremap <silent> <leader>te :call helpers#call_from_last_root_dir('FZF')<cr>
 
 if exists(":GrokRef")
   noremap <silent> <leader>rf :GrokRef<cr><cr>

@@ -82,7 +82,7 @@ function! helpers#find_git_root(...)
     silent! execute 'lcd '.s:tmp_path
 endfunction
 
-function! helpers#find_first_root()
+function! helpers#find_last_root()
     return helpers#find_git_root(1)
 endfunction
 
@@ -105,10 +105,10 @@ function! helpers#call_from_git_root(cmd)
     execute 'lcd '.s:tmp_path
 endfunction
 
-function! helpers#call_from_first_root_dir(cmd)
+function! helpers#call_from_last_root_dir(cmd)
     let s:tmp_path = getcwd()
     lcd %:p:h
-    execute 'lcd '.helpers#find_first_root()
+    execute 'lcd '.helpers#find_last_root()
 
     execute a:cmd
 

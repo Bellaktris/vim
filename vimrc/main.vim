@@ -66,8 +66,8 @@ call plug#begin(g:vim_plug_dir)
 
   Plug 'https://github.com/google/vim-maktaba'
 
-  " very strange bug...
-  " Plug 'https://github.com/google/vim-glaive'
+  Plug 'https://github.com/autozimu/LanguageClient-neovim',
+    \{ 'branch': 'next', 'do': 'bash install.sh' }
 
   Plug 'https://github.com/kana/vim-textobj-user'
 
@@ -132,7 +132,7 @@ call plug#begin(g:vim_plug_dir)
   if executable('go') | let s:ycm_install .= ' --gocode-completer' | endif
   if executable('node') | let s:ycm_install .= ' --tern-completer' | endif
 
-  if v:version >= 742
+  if v:version >= 742 || has('nvim')
     execute "Plug 'https://github.com/Valloric/YouCompleteMe', "
       \. "{ 'do': " . s:ycm_install . "' }"
 
