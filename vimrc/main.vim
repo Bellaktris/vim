@@ -66,8 +66,8 @@ call plug#begin(g:vim_plug_dir)
 
   Plug 'https://github.com/google/vim-maktaba'
 
-  Plug 'https://github.com/autozimu/LanguageClient-neovim',
-    \{ 'branch': 'next', 'do': 'bash install.sh' }
+  " Plug 'https://github.com/autozimu/LanguageClient-neovim',
+  "   \{ 'branch': 'next', 'do': 'bash install.sh' }
 
   Plug 'https://github.com/kana/vim-textobj-user'
 
