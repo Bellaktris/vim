@@ -40,7 +40,7 @@ if has('nvim')
 
     let blacklisted_files = ['BUCK', 'TARGETS']
 
-    augroup vimrcs_plugins_neomake | au!
+    augroup neomake_group | au!
         autocmd VimLeave * let g:neomake_verbose = 0
         autocmd FileType * call s:OpenSignColumn()
         autocmd BufEnter,BufWritePost *

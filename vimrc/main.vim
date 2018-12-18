@@ -139,11 +139,9 @@ call plug#begin(g:vim_plug_dir)
     Plug 'https://github.com/rdnetto/YCM-Generator',
       \ { 'on': 'YcmGenerateConfig', 'branch': 'stable' }
 
-    if exists(':YcmDebugInfo')
-      augroup YCMAugroup | au!
-        au VimEnter * call youcompleteme#Enable() | au! YCMAugroup
-      augroup END
-    endif " exists(':YcmDebugInfo')
+    augroup ycm_group | au!
+      au VimEnter * call youcompleteme#Enable()
+    augroup END
   endif
 " }}}
 
@@ -157,10 +155,16 @@ call plug#begin(g:vim_plug_dir)
 
 " Appearance and syntax highlighting                                       {{{
   Plug 'https://github.com/mhinz/vim-startify'
+  augroup startify_group | au!
+    autocmd VimEnter * if !argc() | Startify | endif
+  augroup END
 
   Plug 'https://github.com/mhinz/vim-hugefile'
 
   Plug 'https://github.com/chriskempson/base16-vim'
+
+  Plug 'https://github.com/powerman/vim-plugin-AnsiEsc',
+    \{ 'on': 'AnsiEsc' }
 
   Plug 'https://github.com/ap/vim-css-color',
     \{ 'for': ['css', 'scss', 'less'] }
@@ -277,13 +281,13 @@ call plug#begin(g:vim_plug_dir)
 
   Plug 'https://github.com/tpope/vim-abolish'
 
-  Plug 'https://github.com/lyuts/vim-rtags'
+  " Plug 'https://github.com/lyuts/vim-rtags'
 
   Plug 'https://github.com/vim-scripts/UltiSnips',
     \ { 'on': [] }
 
-  augroup ultisnips_startup | au!
-    au InsertEnter * call plug#load('UltiSnips')
+  augroup ultisnips_group | au!
+    au InsertEnter * call plug#load('UltiSnips') | au! ultisnips_group
   augroup END
 
   Plug 'https://github.com/Bellaktris/vim-snippets'
