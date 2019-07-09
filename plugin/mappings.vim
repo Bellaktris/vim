@@ -55,9 +55,8 @@ function! AddSpacesAround() range
     noautocmd execute "normal a \<Esc>"
 endfunction
 
-noremap <silent> <s-space> v:call AddSpacesAround()<cr>
-
-
+vnoremap <silent> <s-space> :<c-u>call AddSpacesAround()<cr>
+noremap <silent> <s-space> v:<c-u>call AddSpacesAround()<cr>
 
 if &clipboard[:10] == 'unnamedplus'
     xnoremap <silent> <expr> p

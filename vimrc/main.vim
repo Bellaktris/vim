@@ -112,7 +112,7 @@ call plug#begin(g:vim_plug_dir)
     \ { 'on': ['ViewDocHelp', 'ViewDoc', 'ViewDocMan'] }
 
   Plug 'https://github.com/tpope/vim-dispatch',
-        \ { 'on': ['Make', 'Dispatch'] }
+    \ { 'on': ['Make', 'Dispatch'] }
   Plug 'https://github.com/radenling/vim-dispatch-neovim',
     \ { 'on': ['Make', 'Dispatch'] }
 
@@ -154,10 +154,7 @@ call plug#begin(g:vim_plug_dir)
 " }}}
 
 " Appearance and syntax highlighting                                       {{{
-  Plug 'https://github.com/mhinz/vim-startify'
-  augroup startify_group | au!
-    autocmd VimEnter * if !argc() | Startify | endif
-  augroup END
+  " Plug 'https://github.com/mhinz/vim-startify'
 
   Plug 'https://github.com/mhinz/vim-hugefile'
 
@@ -293,9 +290,6 @@ call plug#begin(g:vim_plug_dir)
   Plug 'https://github.com/Bellaktris/vim-snippets'
 " }}}
 
-" IDE features {{{
-" }}}
-
 " Syntax checking                                                          {{{
   Plug 'https://github.com/benekastah/neomake',
     \ { 'on': 'Neomake' }
@@ -310,6 +304,9 @@ call plug#begin(g:vim_plug_dir)
 " }}}
 
 call plug#end()
+
+if !has('nvim') | echohl WarningMsg \
+  | echo "Neovim isn't available, running vim..." | echohl None | endif
 
 let plugins = glob(expand('<sfile>:p:h') . '/plugin-options/*.vim')
 for file in split(plugins, '\n') | execute 'source ' . file | endfor
