@@ -33,6 +33,17 @@ let g:mapleader = ","
 let g:maplocalleader = ","
 
 " General
+" function! BetterG()
+"   call cursor('$', col('.'))
+" endfunction
+
+" function! Bettergg()
+"   call cursor(1, col('.'))
+" endfunction
+
+" vnoremap <silent> gg :call Bettergg()<cr>
+" vnoremap <silent> G :call BetterG()<cr>
+
 function! AddlineAbove()
   silent! noautocmd execute "normal mzO \<Esc>\"_x`z"
 endfunction
@@ -140,12 +151,6 @@ nnoremap <silent> <leader>en :call EnMasse()<cr>
 
 noremap <leader>cd :cd %:p:h<cr>:pwd<cr>
 noremap <silent> <leader>te :call helpers#call_from_last_root_dir('FZF')<cr>
-
-if exists(":GrokRef")
-  noremap <silent> <leader>rf :GrokRef<cr><cr>
-else
-  noremap <silent> <Leader>rf :call rtags#FindRefs()<cr>
-endif
 
 " Fast scripting and ide-like features
 nmap <leader>xx <plug>(execute-file)

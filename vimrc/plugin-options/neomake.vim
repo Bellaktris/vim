@@ -26,10 +26,10 @@ if has('nvim')
         \. '/neomake/autoload/neomake/makers/ft/*.vim'))
 
     let i = 0
-	for ftype in s:neomake_filetypes
+    for ftype in s:neomake_filetypes
         let s:neomake_filetypes[i] = fnamemodify(ftype, ':t:r')
         let i = i + 1
-	endfor
+    endfor
 
     sign define dummy
 
@@ -42,7 +42,7 @@ if has('nvim')
 
     augroup neomake_group | au!
         autocmd VimLeave * let g:neomake_verbose = 0
-        autocmd FileType * call s:OpenSignColumn()
+         autocmd FileType * call s:OpenSignColumn()
         autocmd BufEnter,BufWritePost *
           \ if helpers#is_small() != 0 && exists(":Neomake")
           \ && index(blacklisted_files, expand('%:t')) < 0
@@ -106,7 +106,7 @@ if has('nvim')
     let g:neomake_c_enabled_makers = []
     let g:neomake_cpp_enabled_makers = []
 
-    if system("python3 -m pip list 2>/dev/null | grep -F cpplint") != ""
+    if executable("cpplint")
         let g:neomake_c_enabled_makers += ['cpplint']
         let g:neomake_cpp_enabled_makers += ['cpplint']
     endif

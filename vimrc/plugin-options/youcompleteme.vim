@@ -27,10 +27,6 @@ let s:smart_goto_guard = 0
 let s:modified = 1
 
 function! SmartGoTo()
-  if (&ft=='cpp' || &ft=='c') && system('pgrep rdm') != ''
-      execute "silent! if RTagsJumpTo() > 0 | return | endif"
-  endif
-
   if s:smart_goto_guard == 0
     let s:smart_goto_guard = 1
 
@@ -69,9 +65,6 @@ function! SmartGoTo()
   redir END
 
   let s:lastmsg=get(split(g:ycm_last_message, "\n"), -1, "")
-  if exists(":GrokDef") && (s:lastmsg[:10] == "ValueError:"
-        \ || s:lastmsg[:12] == "RuntimeError:")
-    execute "GrokDef" | redraw! | endif
 endfunction
 
 nmap <silent> <Plug>(SmartGoTo) :call SmartGoTo()<cr>

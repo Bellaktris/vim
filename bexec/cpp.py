@@ -38,7 +38,7 @@ mode = args.mode
 timeout = args.timeout
 
 
-flags = {'release': ['-O2'], 'debug': ['-g']}
+flags = {'release': ['-O3'], 'debug': ['-g']}
 
 # ----------------------------------------------------------
 # ----------------------------------------------------------
@@ -67,10 +67,9 @@ for target in [mode]:
         creation_time = max(mtime(source_file), mtime(argsfile))
 
         if file_not_exists or creation_time > mtime(binary_path):
-            arglist = ['clang++', '-Wall', '-std=c++1z',
-                       '-I/usr/local/include/eigen3',
-                       '-Wno-invalid-partial-specialization',
-                       '-I' + os.path.expanduser('~/.files/c++/include')]
+            arglist = ['clang++', '-Wall', '-std=c++2a', '-march=native',
+                       '-I' + os.path.expanduser('~/.files/c++/include'),
+                       '-I/usr/local/include/eigen3', '-lfolly']
             arglist = arglist + compile_flags
             arglist = arglist + [source_file, '-o', binary_path]
 

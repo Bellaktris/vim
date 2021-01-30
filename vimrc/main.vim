@@ -66,9 +66,6 @@ call plug#begin(g:vim_plug_dir)
 
   Plug 'https://github.com/google/vim-maktaba'
 
-  " Plug 'https://github.com/autozimu/LanguageClient-neovim',
-  "   \{ 'branch': 'next', 'do': 'bash install.sh' }
-
   Plug 'https://github.com/kana/vim-textobj-user'
 
   Plug 'https://github.com/Shougo/unite.vim'
@@ -105,9 +102,6 @@ call plug#begin(g:vim_plug_dir)
 
   Plug 'https://github.com/roxma/vim-tmux-clipboard'
 
-  Plug 'https://github.com/haya14busa/incsearch.vim'
-  Plug 'https://github.com/haya14busa/incsearch-fuzzy.vim'
-
   Plug 'https://github.com/powerman/vim-plugin-viewdoc',
     \ { 'on': ['ViewDocHelp', 'ViewDoc', 'ViewDocMan'] }
 
@@ -121,11 +115,12 @@ call plug#begin(g:vim_plug_dir)
   Plug 'https://github.com/romainl/vim-qf'
 
   if !executable('fwdproxy-config')
-    let s:ycm_install = "'./install.py --clang-completer"
+      let s:ycm_install = "'./install.py --clangd-completer"
   else
     let s:ycm_install = "'http_proxy=http://fwdproxy:8080 "
     let s:ycm_install .= "https_proxy=http://fwdproxy:8080 "
-    let s:ycm_install .= "./install.py --clang-completer"
+
+    let s:ycm_install = "'./install.py --clangd-completer"
   endif  " !executable('fwdproxy-config')
 
   if executable('rustc') | let s:ycm_install .= ' --racer-completer' | endif
@@ -140,7 +135,7 @@ call plug#begin(g:vim_plug_dir)
       \ { 'on': 'YcmGenerateConfig', 'branch': 'stable' }
 
     augroup ycm_group | au!
-      au VimEnter * call youcompleteme#Enable()
+      au VimEnter * call youcompleteme#Enable() | au! youcompletemeStart
     augroup END
   endif
 " }}}
@@ -205,7 +200,7 @@ call plug#begin(g:vim_plug_dir)
     \ {'on': 'AsyncRun'}
 
   Plug 'https://github.com/johnsyweb/vim-makeshift',
-    \ {'on': 'Makeshift'}
+    \ {'on': 'Makeshift', 'branch': 'main' }
 " }}}
 
   " File system and code navigation                                          {{{
@@ -277,8 +272,6 @@ call plug#begin(g:vim_plug_dir)
   Plug 'https://github.com/tpope/vim-commentary'
 
   Plug 'https://github.com/tpope/vim-abolish'
-
-  " Plug 'https://github.com/lyuts/vim-rtags'
 
   Plug 'https://github.com/vim-scripts/UltiSnips',
     \ { 'on': [] }

@@ -48,7 +48,7 @@ if !filereadable(g:temp_dir . '/tmpfile')
 endif
 
 if exists(':Alias')
-  call CmdAlias('tmpfile', 'Tmpfile')
+  call Alias(0, 'tmpfile', 'Tmpfile')
 endif
 
 " autoclose helper windows
@@ -180,9 +180,9 @@ augroup END
 cmap w! w !sudo tee % >/dev/null
 
 
-" neovim defaults
+" " neovim defaults
 set nobackup
-set shortmess=a
+set shortmess=filnxtToOFca
 set nowritebackup
 set noswapfile
 set lazyredraw
@@ -262,4 +262,3 @@ if has('nvim')
     tnoremap <C-k> <C-\><C-n><C-w>k
     tnoremap <C-l> <C-\><C-n><C-w>l
 endif
-
