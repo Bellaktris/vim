@@ -1,25 +1,23 @@
-function! DispatchAddNeovim()
-    augroup dispatch-neovim | au!
-    augroup END
-
-    if index(get(g:, 'dispatch_handlers', ['neovim']), 'neovim') < 0
-        call insert(g:dispatch_handlers, 'neovim', 0)
-    endif
-endfunction
-
 function! MakePre()
-  if bufname("%") != ""
-    exec "noa w"
+  if bufname('%') != ''
+    exec 'noa w'
   endif
 
   if &makeprg == 'make'
-    exec "Makeshift"
+    for [file, prg] in items(g:build_systems)
+      let root = findfile(file, '.;')
+      if root != ''
+        let &makeprg = prg
+        exec 'lcd' fnameescape(fnamemodify(root, ':p:h'))
+        break
+      endif
+    endfor
   endif
 endfunction
 
 command! -nargs=* -bang BMake
           \  call MakePre()
-          \| silent! Make<bang> <args>
+          \| Neomake! <args>
 
 if exists(':Alias')
   call Alias(0, 'make', 'BMake')

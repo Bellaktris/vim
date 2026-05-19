@@ -103,6 +103,8 @@ if has('nvim')
                 \'--filter=-readability/casting'
     \ ]
 
+    let s:has_ycm = exists('g:use_ycm') && g:use_ycm
+
     let g:neomake_c_enabled_makers = []
     let g:neomake_cpp_enabled_makers = []
 
@@ -111,12 +113,12 @@ if has('nvim')
         let g:neomake_cpp_enabled_makers += ['cpplint']
     endif
 
-    if executable('clang-tidy')
+    if executable('clang-tidy') && !s:has_ycm
         let g:neomake_c_enabled_makers += ['clangtidy']
         let g:neomake_cpp_enabled_makers += ['clangtidy']
     endif
 
-    if executable('clang-check')
+    if executable('clang-check') && !s:has_ycm
         let g:neomake_c_enabled_makers += ['clangcheck']
         let g:neomake_cpp_enabled_makers += ['clangcheck']
     endif

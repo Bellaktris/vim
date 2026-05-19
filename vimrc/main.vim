@@ -84,17 +84,12 @@ call plug#begin(g:vim_plug_dir)
 
   Plug 'https://github.com/pgdouyon/vim-evanesco'
 
-  Plug 'https://github.com/roxma/vim-tmux-clipboard'
+  Plug 'https://github.com/roxma/vim-tmux-clipboard', { 'on': [] }
+  autocmd VimEnter * ++once silent! call plug#load('vim-tmux-clipboard')
 
   Plug 'https://github.com/powerman/vim-plugin-viewdoc',
     \ { 'on': ['ViewDocHelp', 'ViewDoc', 'ViewDocMan'] }
 
-  Plug 'https://github.com/tpope/vim-dispatch',
-    \ { 'on': ['Make', 'Dispatch'] }
-  Plug 'https://github.com/radenling/vim-dispatch-neovim',
-    \ { 'on': ['Make', 'Dispatch'] }
-
-  au User vim-dispatch-neovim call DispatchAddNeovim()
 
   Plug 'https://github.com/romainl/vim-qf'
   let g:qf_auto_open_loclist = 0
@@ -182,8 +177,6 @@ call plug#begin(g:vim_plug_dir)
   Plug 'https://github.com/skywind3000/asyncrun.vim',
     \ {'on': 'AsyncRun'}
 
-  Plug 'https://github.com/johnsyweb/vim-makeshift',
-    \ {'on': 'Makeshift', 'branch': 'main' }
 " }}}
 
   " File system and code navigation                                          {{{
@@ -325,7 +318,7 @@ let g:native_lsp = exists('g:lsp_servers') && !empty(g:lsp_servers)
       \ && (!exists('g:use_ycm') || !g:use_ycm) && has('nvim-0.11')
 
 if !has('nvim')
-  echohl WarningMsg | echom "Neovim isn't available, running vim..." | echohl None
+  autocmd VimEnter * ++once echohl WarningMsg | echom "Neovim isn't available, running vim..." | echohl None
 endif
 
 let plugins = glob(expand('<sfile>:p:h') . '/plugin-options/*.vim')
