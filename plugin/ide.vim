@@ -217,11 +217,11 @@ function! GoToInclude()
     return
   endif
 
-  let l:file = expand('<cfile>')
-  if filereadable(l:file)
-    call helpers#goto_location(l:file, 1, 1)
+  let l:found = findfile(expand('<cfile>'))
+  if l:found != ''
+    call helpers#goto_location(l:found, 1, 1)
   else
-    execute "normal! \<c-w>gf"
+    echohl WarningMsg | echo "File not found: " . expand('<cfile>') | echohl None
   endif
 endfunction
 

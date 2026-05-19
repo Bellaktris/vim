@@ -268,7 +268,8 @@ call plug#begin(g:vim_plug_dir)
   Plug 'https://github.com/SirVer/ultisnips', { 'on': [] }
 
   augroup ultisnips_group | au!
-    au InsertEnter * call plug#load('ultisnips') | au! ultisnips_group
+    au InsertEnter * if has('python3') | call plug#load('ultisnips') | endif
+          \| au! ultisnips_group
   augroup END
 
   Plug 'https://github.com/Bellaktris/vim-snippets'
