@@ -157,6 +157,33 @@ function! JumpToDefinition()
 endfunction
 
 
+" IDE: jedi call signatures (Python, via floating window)
+if has('python3') && has('nvim')
+  execute 'command! -nargs=1 PythonJedi python3 <args>'
+
+  augroup jedi_init | au!
+    au FileType python
+          \ execute "python3 sys.path.insert(0, '" . g:root_dir . "')"
+          \| execute "python3 import jedi_signatures"
+          \| au! jedi_init
+  augroup END
+
+  function! s:JediShowCallSignatures()
+    PythonJedi jedi_signatures.show_call_signatures()
+  endfunction
+
+  function! s:JediClearCallSignatures()
+    PythonJedi jedi_signatures.clear_call_signatures()
+  endfunction
+
+  augroup jedi_signatures | au!
+    au FileType python
+          \ autocmd CursorMovedI <buffer> call s:JediShowCallSignatures()
+          \| autocmd InsertLeave <buffer> call s:JediClearCallSignatures()
+  augroup END
+endif
+
+
 " IDE: code search (grep wrappers)
 function! FastGrepFirstRoot(line, opts)
     execute 'lcd ' . helpers#find_git_root()
