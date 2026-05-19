@@ -102,34 +102,78 @@ endfunction
 nmap <silent> <plug>(execute-file) :call <SID>ExecuteFile()<cr>
 
 
-" IDE: go-to-definition (native LSP → YCM → ctags)
+" IDE: navigate to file:line, reusing existing tab or opening new one
+function! s:GotoLocation(file, lnum, col)
+  let l:target = fnamemodify(a:file, ':p')
+  let l:cur = expand('%:p')
+
+  " Mark jumplist before navigating
+  normal! m'
+
+  " Same file — just move cursor
+  if l:target ==# l:cur
+    call cursor(a:lnum, a:col)
+    normal! zv
+    return
+  endif
+
+  " Check all tabs for a window showing this file
+  for l:tab in range(1, tabpagenr('$'))
+    for l:win_bufnr in tabpagebuflist(l:tab)
+      if fnamemodify(bufname(l:win_bufnr), ':p') ==# l:target
+        execute 'tabnext' l:tab
+        execute bufwinnr(l:win_bufnr) . 'wincmd w'
+        call cursor(a:lnum, a:col)
+        normal! zv
+        return
+      endif
+    endfor
+  endfor
+
+  " Not open anywhere — new tab
+  execute 'tabedit ' . fnameescape(l:target)
+  call cursor(a:lnum, a:col)
+  normal! zv
+endfunction
+
+" YCM helper: run a YCM command and capture the jump via s:GotoLocation
+function! s:YcmGoto(cmd)
+  let l:orig_file = expand('%:p')
+  let l:orig_pos = getpos('.')
+  execute 'YcmCompleter' a:cmd
+  let l:new_file = expand('%:p')
+  let l:new_pos = getpos('.')
+  if l:new_file !=# l:orig_file || l:new_pos != l:orig_pos
+    " YCM jumped — undo its jump and redo via our tab-reuse logic
+    execute 'buffer ' . bufnr(l:orig_file)
+    call setpos('.', l:orig_pos)
+    call s:GotoLocation(l:new_file, l:new_pos[1], l:new_pos[2])
+  endif
+endfunction
+
+" LSP goto with tab reuse
 if has('nvim-0.11')
 lua << EOF
-  function _G.lsp_goto_definition_tab()
-    local cur_buf = vim.api.nvim_get_current_buf()
-    vim.lsp.buf.definition({
+  function _G.lsp_goto(method)
+    method = method or 'definition'
+    vim.lsp.buf[method]({
       on_list = function(result)
         if not result or not result.items or #result.items == 0 then return end
         local item = result.items[1]
-        local target = item.filename or item.bufnr and vim.api.nvim_buf_get_name(item.bufnr)
+        local target = item.filename or (item.bufnr and vim.api.nvim_buf_get_name(item.bufnr))
         if not target then return end
-        local lnum = item.lnum or 1
-        local col = item.col or 1
-        if target == vim.api.nvim_buf_get_name(cur_buf) then
-          vim.api.nvim_win_set_cursor(0, { lnum, col - 1 })
-        else
-          vim.cmd('tabedit +' .. lnum .. ' ' .. vim.fn.fnameescape(target))
-          vim.api.nvim_win_set_cursor(0, { lnum, col - 1 })
-        end
+        vim.fn['s:GotoLocation'](target, item.lnum or 1, item.col or 1)
       end,
     })
   end
 EOF
 endif
 
+
+" IDE: go-to-definition (native LSP → YCM → ctags)
 function! JumpToDefinition()
   if exists('g:native_lsp') && g:native_lsp
-    lua lsp_goto_definition_tab()
+    lua lsp_goto('definition')
     return
   endif
 
@@ -138,7 +182,7 @@ function! JumpToDefinition()
       let l:cmds = py3eval('ycm_state.GetDefinedSubcommands()')
       for l:cmd in ['GoTo', 'GoToDefinition', 'GoToDeclaration']
         if index(l:cmds, l:cmd) >= 0
-          execute 'YcmCompleter' l:cmd
+          call s:YcmGoto(l:cmd)
           return
         endif
       endfor
@@ -147,9 +191,62 @@ function! JumpToDefinition()
   endif
 
   try
-    execute "normal! g]"
+    execute "normal! g\<c-]>"
   catch /E426\|E433/
     echohl WarningMsg | echo "No definition found" | echohl None
+  endtry
+endfunction
+
+
+" IDE: go-to-include (native LSP → YCM → vim gf)
+function! GoToInclude()
+  if exists('g:native_lsp') && g:native_lsp
+    lua lsp_goto('definition')
+    return
+  endif
+
+  if exists(':YcmCompleter') == 2
+    try
+      let l:cmds = py3eval('ycm_state.GetDefinedSubcommands()')
+      if index(l:cmds, 'GoToInclude') >= 0
+        call s:YcmGoto('GoToInclude')
+        return
+      endif
+    catch
+    endtry
+  endif
+
+  let l:file = expand('<cfile>')
+  if filereadable(l:file)
+    call s:GotoLocation(l:file, 1, 1)
+  else
+    execute "normal! \<c-w>gf"
+  endif
+endfunction
+
+
+" IDE: find references (native LSP → YCM → ctags)
+function! FindReferences()
+  if exists('g:native_lsp') && g:native_lsp
+    lua vim.lsp.buf.references()
+    return
+  endif
+
+  if exists(':YcmCompleter') == 2
+    try
+      let l:cmds = py3eval('ycm_state.GetDefinedSubcommands()')
+      if index(l:cmds, 'GoToReferences') >= 0
+        YcmCompleter GoToReferences
+        return
+      endif
+    catch
+    endtry
+  endif
+
+  try
+    execute "normal! g]"
+  catch /E426\|E433/
+    echohl WarningMsg | echo "No references found" | echohl None
   endtry
 endfunction
 

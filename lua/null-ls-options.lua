@@ -9,7 +9,6 @@ vim.fn.sign_define("DiagnosticSignHint", { text = "i", texthl = "DiagnosticSignH
 
 on_attach = function(client, bufnr)
   local opts = { noremap=true, silent=true }
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>rf', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
   vim.diagnostic.setqflist({ open = false })
   vim.diagnostic.show(nil, 0)

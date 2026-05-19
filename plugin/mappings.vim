@@ -24,7 +24,7 @@ map j gj
 map k gk
 
 nnoremap <c-w>gf gf
-nnoremap gf <c-w>gf
+nnoremap <silent> gf :call GoToInclude()<cr>
 
 cmap w! w !sudo tee % >/dev/null
 
@@ -99,6 +99,9 @@ noremap <silent> <leader>cc :let &colorcolumn = g:colorcolumn - &colorcolumn<cr>
 
 " Navigation
 nmap <silent> <leader>jp :call JumpToDefinition()<cr>
+nmap <silent> <leader>rf :call FindReferences()<cr>
+nnoremap <silent> g<c-]> :call JumpToDefinition()<cr>
+nnoremap <silent> g] :call FindReferences()<cr>
 
 nmap <leader>nt <plug>NerdTreeStart
 noremap <silent> <leader>tb :let g:tagbar_width=helpers#free_hspace()<cr>:TagbarToggle<cr>

@@ -93,13 +93,17 @@ function! helpers#find_last_root()
 endfunction
 
 function! helpers#open_new_or_existing(buf_name)
-    let l:buf_id = bufnr(a:buf_name)
-    let l:win_ids = win_findbuf(l:buf_id)
-    if len(l:win_ids) != 0
-        call win_gotoid(l:win_ids[0])
-    else
-        exec "tabedit " . a:buf_name
-    endif
+    let l:target = fnamemodify(a:buf_name, ':p')
+    for l:tab in range(1, tabpagenr('$'))
+      for l:bufnr in tabpagebuflist(l:tab)
+        if fnamemodify(bufname(l:bufnr), ':p') ==# l:target
+          execute 'tabnext' l:tab
+          execute bufwinnr(l:bufnr) . 'wincmd w'
+          return
+        endif
+      endfor
+    endfor
+    execute 'tabedit ' . fnameescape(a:buf_name)
 endfunction
 
 function! helpers#setup_goto_mappings()
