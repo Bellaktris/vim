@@ -1,19 +1,9 @@
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Sections:
-"    -> Leader
-"    -> General
-"    -> Motion related
-"    -> Appearance
-"    -> Filesystem and code navigation
-"    -> Fast scripting
-"    -> General editing
-"    -> Command line
-"    -> Code editing
-"    -> Spell checking
-"
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Leader
+let g:mapleader = ","
+let g:maplocalleader = ","
 
-" Changes to vim's defaults
+
+" Vim default overrides
 onoremap b vb
 onoremap B vB
 
@@ -28,22 +18,27 @@ imap <c-n> <c-[>ua
 
 noremap <silent> <s-d> i<cr><c-[>
 
-" Leader
-let g:mapleader = ","
-let g:maplocalleader = ","
+xnoremap <silent> . :normal .<cr>
 
-" General
-" function! BetterG()
-"   call cursor('$', col('.'))
-" endfunction
+map j gj
+map k gk
 
-" function! Bettergg()
-"   call cursor(1, col('.'))
-" endfunction
+nnoremap <c-w>gf gf
+nnoremap gf <c-w>gf
 
-" vnoremap <silent> gg :call Bettergg()<cr>
-" vnoremap <silent> G :call BetterG()<cr>
+cmap w! w !sudo tee % >/dev/null
 
+
+" Visual @ (execute macro over visual range)
+function! ExecuteMacroOverVisualRange()
+  echo "@".getcmdline()
+  execute ":'<,'>normal @".nr2char(getchar())
+endfunction
+
+xnoremap <silent> @ :<C-u>call ExecuteMacroOverVisualRange()<cr>
+
+
+" Add blank lines
 function! AddlineAbove()
   silent! noautocmd execute "normal mzO \<Esc>\"_x`z"
 endfunction
@@ -55,6 +50,8 @@ endfunction
 noremap <silent> <s-cr> :call AddlineAbove()<cr>
 noremap <silent> <cr>   :call AddlineBelow()<cr>
 
+
+" Add spaces around visual selection
 function! AddSpacesAround() range
     let l:firstpos = getpos("'<")
     let l:lastpos  = getpos("'>")
@@ -69,6 +66,8 @@ endfunction
 vnoremap <silent> <s-space> :<c-u>call AddSpacesAround()<cr>
 noremap <silent> <s-space> v:<c-u>call AddSpacesAround()<cr>
 
+
+" EasyClip paste/substitute (clipboard-aware)
 if &clipboard =~# 'unnamedplus'
     xnoremap <silent> <expr> p
           \ ':<c-u>silent! call EasyClip#Paste#PasteTextVisualMode(''+'',1)<cr>'
@@ -115,27 +114,13 @@ omap <leader>l  <plug>(easyoperator-line-select)
 xmap <leader>l  <plug>(easyoperator-line-select)
 
 
-" Appearance
+" Appearance toggles
 noremap <silent> <leader>za :set foldenable!<cr>
 noremap <silent> <leader>cc :let &colorcolumn = g:colorcolumn - &colorcolumn<cr>
 
 
-" Filesystem and code navigation
-function! s:JumpToDefinition()
-  if exists('g:native_lsp') && g:native_lsp
-    lua lsp_jump_to_tab()
-  elseif exists(':YcmCompleter') == 2
-    call SmartGoTo()
-  else
-    try
-      execute "normal! g]"
-    catch /E426\|E433/
-      echohl WarningMsg | echo "No definition found (no LSP, YCM, or ctags)" | echohl None
-    endtry
-  endif
-endfunction
-
-nmap <silent> <leader>jp :call <SID>JumpToDefinition()<cr>
+" Navigation
+nmap <silent> <leader>jp :call JumpToDefinition()<cr>
 
 nmap <leader>nt <plug>NerdTreeStart
 noremap <silent> <leader>tb :let g:tagbar_width=helpers#free_hspace()<cr>:TagbarToggle<cr>
@@ -143,32 +128,42 @@ noremap <silent> <leader>tb :let g:tagbar_width=helpers#free_hspace()<cr>:Tagbar
 nmap <silent> <leader>gt :Windows<cr>
 nmap <silent> <leader>cp :call helpers#call_from_git_root('FZF')<cr>
 
-if executable('rg') || executable('ag')
-  let g:grep_opts = ''
-elseif executable('git')
-  let g:grep_opts = '-F'
-elseif executable('ack')
-  let g:grep_opts = '-Q'
-else
-  let g:grep_opts = ''
-endif
-
-xmap <silent> <leader>ag y:call FastGrepFirstRoot(substitute(@0, '--', '', 'g'), g:grep_opts)<cr>
-xmap <silent> <leader>gp y:call FastGrepLastRoot(substitute(@0, '--', '', 'g'), g:grep_opts)<cr>
-
-exec "nmap <leader>ag :FastGrepU "
-exec "nmap <leader>gp :FastGrepL "
-
 nnoremap <silent> <leader>en :call EnMasse()<cr>
 
 noremap <leader>cd :cd %:p:h<cr>:pwd<cr>
 noremap <silent> <leader>te :call helpers#call_from_last_root_dir('FZF')<cr>
 
-" Fast scripting and ide-like features
+
+" Window navigation (tmux-aware)
+nnoremap <silent> <c-h> :TmuxNavigateLeft<cr>
+nnoremap <silent> <c-j> :TmuxNavigateDown<cr>
+nnoremap <silent> <c-k> :TmuxNavigateUp<cr>
+nnoremap <silent> <c-l> :TmuxNavigateRight<cr>
+
+inoremap <silent> <c-h> <c-[>:TmuxNavigateLeft<cr>
+inoremap <silent> <c-j> <c-[>:TmuxNavigateDown<cr>
+inoremap <silent> <c-k> <c-[>:TmuxNavigateUp<cr>
+inoremap <silent> <c-l> <c-[>:TmuxNavigateRight<cr>
+
+if has('nvim')
+    tnoremap <C-w>h <C-\><C-n><C-w>h
+    tnoremap <C-w>j <C-\><C-n><C-w>j
+    tnoremap <C-w>k <C-\><C-n><C-w>k
+    tnoremap <C-w>l <C-\><C-n><C-w>l
+
+    tnoremap <C-h> <C-\><C-n><C-w>h
+    tnoremap <C-j> <C-\><C-n><C-w>j
+    tnoremap <C-k> <C-\><C-n><C-w>k
+    tnoremap <C-l> <C-\><C-n><C-w>l
+endif
+
+
+" IDE: execute/view
 nmap <leader>xx <plug>(execute-file)
 nmap <leader>vx <plug>(view-file)
 nmap <leader>le <plug>(view-compilation-status)
 
+" IDE: python/shell split
 if empty($TMUX)
   noremap <silent> <leader>ip :execute helpers#free_hspace()
         \ . 'vsplit term://ptipython3'<cr>
@@ -183,37 +178,8 @@ else
         \ 'tmux split -h -l ' . helpers#free_hspace())<cr>
 endif
 
-let g:state="code"
-function! ChangeState()
-  let l:cursor_pos = getpos(".")
-  if !exists(':LLmode')
-      exec "normal :LLsession new\<cr>"
-  else
-    if g:state=="code"
-      exec "normal :LLmode debug\<cr>"
-      let g:state="debug"
-    else
-      let g:state="code"
-      exec "normal :LLmode code\<cr>"
-    endif
-  endif
-  exec cursor(l:cursor_pos[1], l:cursor_pos[2])
-endfunction
-nmap <silent> <leader>dd :call ChangeState()<cr>
 
-nmap <leader>bp <Plug>LLBreakSwitch
-
-nnoremap <silent> <leader>pt :LL print <C-R>=expand('<cword>')<CR><CR>
-vnoremap <silent> <leader>pt :<C-U>LL print <C-R>=lldb#util#get_selection()<CR><CR>
-
-nmap <silent> <M-cr> :LL continue<cr>
-nmap <silent> <M-j> :LL next<cr>
-nmap <silent> <M-l> :LL step<cr>
-nmap <silent> <M-k> :LL reverse-next<cr>
-nmap <silent> <M-h> :LL finish<cr>
-
-
-" General editing
+" Editing
 xmap <leader>ga <plug>(EasyAlign)
 nmap <leader>ga <plug>(EasyAlign)
 
@@ -243,6 +209,13 @@ cmap <c-n> <down>
 
 cnoremap <s-cr> <c-f>
 cnoremap <silent> <c-r> History:<cr>
+
+augroup command_line | au!
+  au CmdWinEnter * nnoremap <buffer> <s-cr> <cr>
+  au CmdWinEnter * nnoremap <buffer> <cr>   <cr>
+  au CmdWinEnter * nnoremap <buffer> <c-[> <c-c>
+augroup END
+
 
 " Spell checking
 noremap <silent> <leader>ss :setlocal spell!<cr>

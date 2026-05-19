@@ -27,27 +27,6 @@ let g:ycm_last_message = ''
 let g:ycm_error_symbol = '✘'
 let g:ycm_warning_symbol = '✘'
 
-function! SmartGoTo()
-  try
-    let l:subcommands = py3eval('ycm_state.GetDefinedSubcommands()')
-  catch
-    echohl WarningMsg | echo "YCM not available for this buffer" | echohl None
-    return
-  endtry
-
-  if index(l:subcommands, 'GoTo') >= 0
-    YcmCompleter GoTo
-  elseif index(l:subcommands, 'GoToDefinition') >= 0
-    YcmCompleter GoToDefinition
-  elseif index(l:subcommands, 'GoToDeclaration') >= 0
-    YcmCompleter GoToDeclaration
-  else
-    echohl WarningMsg | echo "No GoTo command available for this file type" | echohl None
-  endif
-endfunction
-
-nmap <silent> <Plug>(SmartGoTo) :call SmartGoTo()<cr>
-
 " Wire g:lsp_servers into YCM's g:ycm_language_server.
 " Servers with built-in YCM support (clangd, gopls, rust-analyzer, tsserver)
 " are handled by YCM's install flags and don't need entries here.
