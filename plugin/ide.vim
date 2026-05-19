@@ -26,6 +26,37 @@ endfunction
 
 call s:RebuildRunners()
 
+function! s:RebuildMakeshiftSystems()
+  let l:type = g:ide_mode ==# 'debug' ? 'Debug' : 'Release'
+  let l:dir = 'build-' . g:ide_mode
+  let l:buck_mode = g:ide_mode ==# 'debug' ? 'dev' : 'opt'
+
+  let l:cmake = 'mkdir -p ' . l:dir . ' && cd ' . l:dir
+        \. ' && cmake -DCMAKE_BUILD_TYPE=' . l:type
+  if g:ide_compiler_arglist != ''
+    let l:cmake .= ' -DCMAKE_CXX_FLAGS="' . g:ide_compiler_arglist . '"'
+  endif
+
+  if executable('ninja')
+    let g:makeshift_systems = {
+      \ 'CMakeLists.txt': l:cmake . ' -G Ninja .. && ninja',
+    \}
+  else
+    let g:makeshift_systems = {
+      \ 'CMakeLists.txt': l:cmake . ' .. && make',
+    \}
+  endif
+
+  let g:makeshift_systems['BUILD'] =
+    \'blaze build --color=no --curses=no'
+
+  let g:makeshift_systems['TARGETS'] =
+    \'buck build @mode/' . l:buck_mode
+    \. ' /${PWD#$HOME/fbsource/fbcode}/...'
+endfunction
+
+call s:RebuildMakeshiftSystems()
+
 augroup ide_file_hooks | au!
   au BufLeave,BufWrite */ide-stdargs call UpdateStdargs()
   au BufLeave,BufWrite */ide-cpp-stdargs call CCargsRead()
@@ -36,6 +67,8 @@ augroup END
 function! s:SetMode(mode)
   let g:ide_mode = a:mode
   call s:RebuildRunners()
+  call s:RebuildMakeshiftSystems()
+  set makeprg=make
 endfunction
 
 command! Release call s:SetMode('release')
@@ -64,6 +97,8 @@ endfunction
 function! CCargsRead()
   let g:ide_compiler_arglist = join(readfile(g:ide_compiler_stdargs), ' ')
   call s:RebuildRunners()
+  call s:RebuildMakeshiftSystems()
+  set makeprg=make
 endfunction
 
 command! -nargs=? Stdin call s:EditIdeFile('ide_stdin', <f-args>)
