@@ -6,13 +6,19 @@ function! helpers#is_small()
     return getfsize(expand('<afile>')) <= 1048576 * g:largefile_trigger_size
 endfunction
 
-function! helpers#call_from_here(cmd)
+function! helpers#call_from_dir(cmd, dir)
     let s:tmp_path = getcwd()
-    lcd %:p:h
-
+    execute 'lcd ' . a:dir
     execute a:cmd
-
     execute 'lcd '.s:tmp_path
+endfunction
+
+function! helpers#call_from_git_root(cmd)
+    call helpers#call_from_dir(a:cmd, helpers#find_git_root())
+endfunction
+
+function! helpers#call_from_last_root_dir(cmd)
+    call helpers#call_from_dir(a:cmd, helpers#find_last_root())
 endfunction
 
 function! helpers#free_hspace()
@@ -34,7 +40,7 @@ function! helpers#shellescape(str)
           \ get({'(': ')', '"(': ')"'}, &shellquote, &shellquote)
 endfunction
 
-function! helpers#parse_shebang() abort " {{{2
+function! helpers#parse_shebang() abort
     for lnum in range(1, 5)
         let line = getline(lnum)
         if line =~# '^#!'
@@ -86,35 +92,6 @@ function! helpers#find_last_root()
     return helpers#find_git_root(1)
 endfunction
 
-function! helpers#call_from_current_dir(cmd)
-    let s:tmp_path = getcwd()
-    lcd %:p:h
-
-    execute a:cmd
-
-    execute 'lcd '.s:tmp_path
-endfunction
-
-function! helpers#call_from_git_root(cmd)
-    let s:tmp_path = getcwd()
-    lcd %:p:h
-    execute 'lcd '.helpers#find_git_root()
-
-    execute a:cmd
-
-    execute 'lcd '.s:tmp_path
-endfunction
-
-function! helpers#call_from_last_root_dir(cmd)
-    let s:tmp_path = getcwd()
-    lcd %:p:h
-    execute 'lcd '.helpers#find_last_root()
-
-    execute a:cmd
-
-    execute 'lcd '.s:tmp_path
-endfunction
-
 function! helpers#open_new_or_existing(buf_name)
     let l:buf_id = bufnr(a:buf_name)
     let l:win_ids = win_findbuf(l:buf_id)
@@ -122,5 +99,21 @@ function! helpers#open_new_or_existing(buf_name)
         call win_gotoid(l:win_ids[0])
     else
         exec "tabedit " . a:buf_name
-    endif  " len(l:bufs) == 0
+    endif
+endfunction
+
+function! helpers#setup_goto_mappings()
+    nmap <buffer> g] <Plug>(SmartGoTo)
+    nmap <buffer> g<c-]> <Plug>(SmartGoTo)
+    nmap <buffer> gd <Plug>(SmartGoTo)
+    nmap <buffer> gD <Plug>(SmartGoTo)
+endfunction
+
+function! helpers#setup_grep(tool)
+    if !executable(a:tool) | return | endif
+    execute 'xmap <silent><buffer> <leader>ag y:execute "lcd ".helpers#find_git_root()<cr>'
+          \ . ':exe "Grepper -noprompt -grepprg ' . a:tool . ' -i -s "'
+          \ . '. helpers#shellescape(substitute(@0, ''--'', '''', ''g''))<cr>'
+    execute 'command! -buffer -nargs=* FastGrep execute "Grepper -noprompt -grepprg '
+          \ . a:tool . ' -i -s ".helpers#shellescape(''<args>'')'
 endfunction

@@ -68,34 +68,12 @@ noremap <silent> <s-space> v:<c-u>call AddSpacesAround()<cr>
 
 
 " EasyClip paste/substitute (clipboard-aware)
-if &clipboard =~# 'unnamedplus'
-    xnoremap <silent> <expr> p
-          \ ':<c-u>silent! call EasyClip#Paste#PasteTextVisualMode(''+'',1)<cr>'
-    xnoremap <silent> <expr> P
-          \ ':<c-u>silent! call EasyClip#Paste#PasteTextVisualMode(''+'',1)<cr>'
+let s:reg = &clipboard =~# 'unnamedplus' ? '+' : &clipboard =~# 'unnamed' ? '*' : '"'
 
-    nnoremap <silent> s :<c-u>silent! call EasyClip#Substitute#OnPreSubstitute('+', 1)<cr>:silent! set opfunc=EasyClip#Substitute#SubstituteMotion<cr>g@
-
-    nnoremap <silent> S :<c-u>silent! call EasyClip#Substitute#SubstituteLine('+', 1)<cr>:silent! call repeat#set("\<plug>SubstituteLine")<cr>
-elseif &clipboard =~# 'unnamed'
-    xnoremap <silent> <expr> p
-          \ ':<c-u>silent! call EasyClip#Paste#PasteTextVisualMode(''*'',1)<cr>'
-    xnoremap <silent> <expr> P
-          \ ':<c-u>silent! call EasyClip#Paste#PasteTextVisualMode(''*'',1)<cr>'
-
-    nnoremap <silent> s :<c-u>silent! call EasyClip#Substitute#OnPreSubstitute('*', 1)<cr>:silent! set opfunc=EasyClip#Substitute#SubstituteMotion<cr>g@
-
-    nnoremap <silent> S :<c-u>silent! call EasyClip#Substitute#SubstituteLine('*', 1)<cr>:silent! call repeat#set("\<plug>SubstituteLine")<cr>
-else
-    xnoremap <silent> <expr> p
-          \ ':<c-u>silent! call EasyClip#Paste#PasteTextVisualMode(''"'',1)<cr>'
-    xnoremap <silent> <expr> P
-          \ ':<c-u>silent! call EasyClip#Paste#PasteTextVisualMode(''"'',1)<cr>'
-
-    nnoremap <silent> s :<c-u>silent! call EasyClip#Substitute#OnPreSubstitute('"', 1)<cr>:silent! set opfunc=EasyClip#Substitute#SubstituteMotion<cr>g@
-
-    nnoremap <silent> S :<c-u>silent! call EasyClip#Substitute#SubstituteLine('"', 1)<cr>:silent! call repeat#set("\<plug>SubstituteLine")<cr>
-endif
+execute "xnoremap <silent> <expr> p ':<c-u>silent! call EasyClip#Paste#PasteTextVisualMode(''".s:reg."'',1)<cr>'"
+execute "xnoremap <silent> <expr> P ':<c-u>silent! call EasyClip#Paste#PasteTextVisualMode(''".s:reg."'',1)<cr>'"
+execute "nnoremap <silent> s :<c-u>silent! call EasyClip#Substitute#OnPreSubstitute('".s:reg."', 1)<cr>:silent! set opfunc=EasyClip#Substitute#SubstituteMotion<cr>g@"
+execute "nnoremap <silent> S :<c-u>silent! call EasyClip#Substitute#SubstituteLine('".s:reg."', 1)<cr>:silent! call repeat#set(\"\\<plug>SubstituteLine\")<cr>"
 
 nmap <c-n> <plug>EasyClipSwapPasteForward
 nmap <c-p> <plug>EasyClipSwapPasteBackwards
@@ -135,27 +113,14 @@ noremap <silent> <leader>te :call helpers#call_from_last_root_dir('FZF')<cr>
 
 
 " Window navigation (tmux-aware)
-nnoremap <silent> <c-h> :TmuxNavigateLeft<cr>
-nnoremap <silent> <c-j> :TmuxNavigateDown<cr>
-nnoremap <silent> <c-k> :TmuxNavigateUp<cr>
-nnoremap <silent> <c-l> :TmuxNavigateRight<cr>
-
-inoremap <silent> <c-h> <c-[>:TmuxNavigateLeft<cr>
-inoremap <silent> <c-j> <c-[>:TmuxNavigateDown<cr>
-inoremap <silent> <c-k> <c-[>:TmuxNavigateUp<cr>
-inoremap <silent> <c-l> <c-[>:TmuxNavigateRight<cr>
-
-if has('nvim')
-    tnoremap <C-w>h <C-\><C-n><C-w>h
-    tnoremap <C-w>j <C-\><C-n><C-w>j
-    tnoremap <C-w>k <C-\><C-n><C-w>k
-    tnoremap <C-w>l <C-\><C-n><C-w>l
-
-    tnoremap <C-h> <C-\><C-n><C-w>h
-    tnoremap <C-j> <C-\><C-n><C-w>j
-    tnoremap <C-k> <C-\><C-n><C-w>k
-    tnoremap <C-l> <C-\><C-n><C-w>l
-endif
+for [s:key, s:dir] in [['h','Left'], ['j','Down'], ['k','Up'], ['l','Right']]
+  execute 'nnoremap <silent> <c-'.s:key.'> :TmuxNavigate'.s:dir.'<cr>'
+  execute 'inoremap <silent> <c-'.s:key.'> <c-[>:TmuxNavigate'.s:dir.'<cr>'
+  if has('nvim')
+    execute 'tnoremap <C-w>'.s:key.' <C-\><C-n><C-w>'.s:key
+    execute 'tnoremap <C-'.s:key.'> <C-\><C-n><C-w>'.s:key
+  endif
+endfor
 
 
 " IDE: execute/view

@@ -51,6 +51,11 @@ endif
 
 
 " IDE: stdin/stdargs/ccargs
+function! s:EditIdeFile(varname, ...)
+  if a:0 && a:1 != '' | let g:{a:varname} = glob(a:1) | endif
+  execute 'tabedit ' . g:{a:varname}
+endfunction
+
 function! UpdateStdargs()
   let g:ide_arglist = join(readfile(g:ide_stdargs), ' ')
   let g:ide_run_args = g:ide_arglist . " < " . g:ide_stdin
@@ -61,18 +66,10 @@ function! CCargsRead()
   call s:RebuildRunners()
 endfunction
 
-command! -nargs=? Stdin
-      \ if <q-args> != '' | let g:ide_stdin = glob(<q-args>) | endif
+command! -nargs=? Stdin call s:EditIdeFile('ide_stdin', <f-args>)
       \ | let g:ide_run_args = g:ide_arglist . " < " . g:ide_stdin
-      \ | exec 'tabedit ' . g:ide_stdin
-
-command! -nargs=? Stdargs
-      \ if <q-args> != '' | let g:ide_stdargs = glob(<q-args>) | endif
-      \ | exec 'tabedit ' . g:ide_stdargs
-
-command! -nargs=? CCargs
-      \ if <q-args> != '' | let g:ide_compiler_stdargs = glob(<q-args>) | endif
-      \ | exec 'tabedit ' . g:ide_compiler_stdargs
+command! -nargs=? Stdargs call s:EditIdeFile('ide_stdargs', <f-args>)
+command! -nargs=? CCargs call s:EditIdeFile('ide_compiler_stdargs', <f-args>)
 
 
 " IDE: execute file
