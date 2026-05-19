@@ -1,14 +1,11 @@
 let g:UltiSnipsSnippetsDir =
   \ g:vim_plug_dir . "/vim-snippets/UltiSnips/"
 
-let g:UltiSnipsEnableSnipMate = 1
+let g:UltiSnipsEnableSnipMate = 0
 let g:UltiSnipsSnippetDirectories = [ "UltiSnips" ]
 
 let g:UltiSnipsEditSplit = 'horizontal'
 
-let g:UltiSnipsEnableSnipMate = 0
-
-" let g:UltiSnipsUsePythonVersion = 3
 let g:ultisnips_python_style = "google"
 
 " Complete UltiSnip snippets with <TAB>/<S-TAB>
@@ -34,12 +31,11 @@ endfunction
 
 let g:UltiSnipsExpandTrigger = "<s-cr>"
 
-" do nothing if there is no snippet
 inoremap <s-cr> <right><left>
 
 let b:did_after_plugin_ultisnips_after = 1
 
-augroup ultisnips_startup
+augroup ultisnips_startup | au!
   au InsertEnter * snoremap <expr> <TAB> g:UltiSnips_JumpForward()
   au InsertEnter * nnoremap <expr> <TAB> g:UltiSnips_JumpForward()
   au InsertEnter * snoremap <expr> <S-TAB> g:UltiSnips_JumpBackward()

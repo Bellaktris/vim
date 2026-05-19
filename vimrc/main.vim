@@ -37,6 +37,7 @@ let g:python3_host_skip_check = 1
 call plug#begin(g:vim_plug_dir)
 
 " Vim-Plug                                                                 {{{
+  let g:plug_window="topleft"
   Plug 'https://github.com/junegunn/vim-plug',
       \ {'on': [], 'do': 'cp plug.vim ' . g:temp_dir}
 " }}}
@@ -78,6 +79,7 @@ call plug#begin(g:vim_plug_dir)
   silent! call plug#load('vim-alias')
 
   Plug 'https://github.com/Konfekt/FastFold'
+  nmap <SID>(DisableFastFoldUpdate) <Plug>(FastFoldUpdate)
   Plug 'https://github.com/kopischke/vim-stay'
 
   Plug 'https://github.com/pgdouyon/vim-evanesco'
@@ -95,6 +97,8 @@ call plug#begin(g:vim_plug_dir)
   au User vim-dispatch-neovim call DispatchAddNeovim()
 
   Plug 'https://github.com/romainl/vim-qf'
+  let g:qf_auto_open_loclist = 0
+  let g:qf_auto_open_quickfix = 0
 
   if exists('g:use_ycm') && g:use_ycm && has('python3')
     let s:ycm_install = "'./install.py --clangd-completer"
@@ -127,6 +131,7 @@ call plug#begin(g:vim_plug_dir)
   Plug 'catppuccin/vim', { 'as': 'catppuccin' }
 
   Plug 'https://github.com/mhinz/vim-hugefile'
+  let g:hugefile_trigger_size=500
 
   Plug 'https://github.com/chriskempson/base16-vim'
 
@@ -148,6 +153,8 @@ call plug#begin(g:vim_plug_dir)
   Plug 'https://github.com/neovimhaskell/haskell-vim'
 
   Plug 'https://github.com/Bellaktris/vim-hack'
+  let g:hack#edit_mode = 'XTabedit'
+  let g:hack#enable = 0
 
   Plug 'https://github.com/nelstrom/vim-markdown-folding'
 
@@ -156,12 +163,16 @@ call plug#begin(g:vim_plug_dir)
   Plug 'https://github.com/artoj/qmake-syntax-vim'
 
   Plug 'https://github.com/octol/vim-cpp-enhanced-highlight'
+  let g:cpp_experimental_template_highlight = 1
+  let g:cpp_class_scope_highlight = 1
+  let g:cpp_member_variable_highlight = 1
 
   Plug 'https://github.com/vim-scripts/google.vim',
     \ { 'for': ['cpp', 'c', 'objc', 'objcpp'],
     \   'do': 'mv indent/google.vim indent/cpp.vim' }
 
   Plug 'https://github.com/tpope/vim-sleuth'
+  let g:sleuth_automatic = 1
 
   Plug 'https://github.com/vim-airline/vim-airline'
   Plug 'https://github.com/vim-airline/vim-airline-themes'
@@ -188,6 +199,8 @@ call plug#begin(g:vim_plug_dir)
     Plug 'https://github.com/Bellaktris/libview'
 
     Plug 'https://github.com/majutsushi/tagbar'
+    let g:tagbar_autofocus = 0
+    let g:tagbar_iconchars = ['▸', '▾']
 
     Plug 'https://github.com/mhinz/vim-grepper',
     \ { 'on': 'Grepper' }
@@ -202,6 +215,8 @@ call plug#begin(g:vim_plug_dir)
   Plug 'https://github.com/junegunn/fzf.vim'
 
   Plug 'https://github.com/vim-scripts/a.vim'
+  let g:alternateNoDefaultAlternate = 1
+  let g:alternateSearchPath = 'sfr:../source,sfr:../src,sfr:../include,sfr:../inc'
 " }}}
 
 " Latex                                                                    {{{
@@ -210,10 +225,12 @@ call plug#begin(g:vim_plug_dir)
 
   Plug 'https://github.com/KeitaNakamura/tex-conceal.vim',
     \ {'for': 'tex'}
+  let g:tex_conceal="mg"
 " }}}
 
 " Tmux integration                                                         {{{
   Plug 'https://github.com/christoomey/vim-tmux-navigator'
+  let g:tmux_navigator_no_mappings = 1
 " }}}
 
 " Git integration                                                          {{{
@@ -226,12 +243,16 @@ call plug#begin(g:vim_plug_dir)
   Plug 'https://github.com/tpope/vim-surround'
 
   Plug 'https://github.com/Bellaktris/latex-unicoder.vim'
+  let g:unicoder_cancel_normal = 1
+  let g:unicoder_cancel_insert = 1
+  let g:unicoder_cancel_visual = 1
 
   Plug 'https://github.com/junegunn/vim-easy-align',
     \ { 'on': ['<Plug>(EasyAlign)'] }
 
   Plug 'https://github.com/Bellaktris/vis.vim',
     \ { 'on': ['B', 'S'] }
+  execute "xnoremap : :B "
   Plug 'https://github.com/tommcdo/vim-exchange'
 
   Plug 'https://github.com/mtth/scratch.vim'
@@ -244,12 +265,11 @@ call plug#begin(g:vim_plug_dir)
 
   Plug 'https://github.com/tpope/vim-abolish'
 
-  " Plug 'https://github.com/vim-scripts/UltiSnips',
-  "   \ { 'on': [] }
+  Plug 'https://github.com/SirVer/ultisnips', { 'on': [] }
 
-  " augroup ultisnips_group | au!
-  "   au InsertEnter * call plug#load('UltiSnips') | au! ultisnips_group
-  " augroup END
+  augroup ultisnips_group | au!
+    au InsertEnter * call plug#load('ultisnips') | au! ultisnips_group
+  augroup END
 
   Plug 'https://github.com/Bellaktris/vim-snippets'
 " }}}
