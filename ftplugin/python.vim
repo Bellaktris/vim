@@ -8,12 +8,9 @@ if helpers#parse_shebang().exe ==# 'python'
   let b:neomake_python_flake8_exe = 'python'
 endif
 
-if !exists('g:lsp_servers') || empty(g:lsp_servers)
-  nmap <silent><buffer> g] <Plug>(SmartGoTo)
-  nmap <silent><buffer> g<c-]> <Plug>(SmartGoTo)
-  nmap <silent><buffer> gd <Plug>(SmartGoTo)
-  nmap <silent><buffer> gD <Plug>(SmartGoTo)
+call helpers#setup_goto_mappings()
 
+if !exists('g:lsp_servers') || empty(g:lsp_servers)
   function! CloseOrMakeNewTab()
     if line2byte( line( '$' ) + 1 ) <= 2
       quit

@@ -92,25 +92,53 @@ function! helpers#find_last_root()
     return helpers#find_git_root(1)
 endfunction
 
-function! helpers#open_new_or_existing(buf_name)
-    let l:target = fnamemodify(a:buf_name, ':p')
+function! helpers#goto_location(file, ...)
+    let l:lnum = a:0 >= 1 ? a:1 : 0
+    let l:col = a:0 >= 2 ? a:2 : 1
+    let l:target = fnamemodify(a:file, ':p')
+
+    if l:lnum > 0
+      normal! m'
+    endif
+
+    if l:target ==# expand('%:p')
+      if l:lnum > 0
+        call cursor(l:lnum, l:col)
+        normal! zv
+      endif
+      return
+    endif
+
     for l:tab in range(1, tabpagenr('$'))
       for l:bufnr in tabpagebuflist(l:tab)
         if fnamemodify(bufname(l:bufnr), ':p') ==# l:target
           execute 'tabnext' l:tab
           execute bufwinnr(l:bufnr) . 'wincmd w'
+          if l:lnum > 0
+            call cursor(l:lnum, l:col)
+            normal! zv
+          endif
           return
         endif
       endfor
     endfor
-    execute 'tabedit ' . fnameescape(a:buf_name)
+
+    execute 'tabedit ' . fnameescape(l:target)
+    if l:lnum > 0
+      call cursor(l:lnum, l:col)
+      normal! zv
+    endif
+endfunction
+
+function! helpers#open_new_or_existing(buf_name)
+    call helpers#goto_location(a:buf_name)
 endfunction
 
 function! helpers#setup_goto_mappings()
-    nmap <buffer> g] <Plug>(SmartGoTo)
-    nmap <buffer> g<c-]> <Plug>(SmartGoTo)
-    nmap <buffer> gd <Plug>(SmartGoTo)
-    nmap <buffer> gD <Plug>(SmartGoTo)
+    nnoremap <silent><buffer> g<c-]> :call JumpToDefinition()<cr>
+    nnoremap <silent><buffer> gd :call JumpToDefinition()<cr>
+    nnoremap <silent><buffer> gD :call JumpToDefinition()<cr>
+    nnoremap <silent><buffer> g] :call FindReferences()<cr>
 endfunction
 
 function! helpers#setup_grep(tool)

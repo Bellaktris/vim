@@ -12,15 +12,19 @@ let g:ide_arglist = join(readfile(g:ide_stdargs), ' ')
 let g:ide_compiler_arglist = join(readfile(g:ide_compiler_stdargs), ' ')
 let g:ide_mode = 'release'
 
-let g:ide_run_args = g:ide_arglist . " < " . g:ide_stdin
-let g:ide_cpp_runner = '/usr/bin/env python3 ' . g:root_dir . '/runners/cpp.py'
-let g:ide_rust_runner = '/usr/bin/env python3 ' . g:root_dir . '/runners/rust.py'
+let g:ide_runner = '/usr/bin/env python3 ' . g:root_dir . '/runners/runner.py'
 let g:ide_runners = {}
 
+function! s:RunArgs()
+  return g:ide_arglist . ' < ' . shellescape(g:ide_stdin)
+endfunction
+
 function! s:RebuildRunners()
-  for [s:lang, s:script] in [['cpp', g:ide_cpp_runner], ['rust', g:ide_rust_runner]]
-    let g:ide_runners[s:lang] = s:script
-          \. ' --args="' . g:ide_compiler_arglist . '" -m "' . g:ide_mode . '"'
+  for l:lang in ['cpp', 'rust']
+    let g:ide_runners[l:lang] = g:ide_runner
+          \. ' --lang ' . l:lang
+          \. ' --args="' . g:ide_compiler_arglist . '"'
+          \. ' -m "' . g:ide_mode . '"'
   endfor
 endfunction
 
@@ -86,12 +90,11 @@ endif
 " IDE: stdin/stdargs/ccargs
 function! s:EditIdeFile(varname, ...)
   if a:0 && a:1 != '' | let g:{a:varname} = glob(a:1) | endif
-  execute 'tabedit ' . g:{a:varname}
+  execute 'tabedit ' . fnameescape(g:{a:varname})
 endfunction
 
 function! UpdateStdargs()
   let g:ide_arglist = join(readfile(g:ide_stdargs), ' ')
-  let g:ide_run_args = g:ide_arglist . " < " . g:ide_stdin
 endfunction
 
 function! CCargsRead()
@@ -102,7 +105,6 @@ function! CCargsRead()
 endfunction
 
 command! -nargs=? Stdin call s:EditIdeFile('ide_stdin', <f-args>)
-      \ | let g:ide_run_args = g:ide_arglist . " < " . g:ide_stdin
 command! -nargs=? Stdargs call s:EditIdeFile('ide_stdargs', <f-args>)
 command! -nargs=? CCargs call s:EditIdeFile('ide_compiler_stdargs', <f-args>)
 
@@ -116,16 +118,16 @@ function! s:ExecuteFile()
   if has_key(g:ide_runners, &filetype)
     let l:cmd = g:ide_runners[&filetype]
           \ . ' ' . shellescape(expand('%:p'))
-          \ . ' ' . g:ide_run_args
+          \ . ' ' . s:RunArgs()
   else
     let l:shebang = helpers#parse_shebang()
     if l:shebang.exe != ''
       let l:cmd = l:shebang.exe . ' ' . join(l:shebang.args)
             \ . ' ' . shellescape(expand('%:p'))
-            \ . ' ' . g:ide_run_args
+            \ . ' ' . s:RunArgs()
     else
       let l:cmd = shellescape(expand('%:p'))
-            \ . ' ' . g:ide_run_args
+            \ . ' ' . s:RunArgs()
     endif
   endif
 
@@ -137,41 +139,7 @@ endfunction
 nmap <silent> <plug>(execute-file) :call <SID>ExecuteFile()<cr>
 
 
-" IDE: navigate to file:line, reusing existing tab or opening new one
-function! s:GotoLocation(file, lnum, col)
-  let l:target = fnamemodify(a:file, ':p')
-  let l:cur = expand('%:p')
-
-  " Mark jumplist before navigating
-  normal! m'
-
-  " Same file — just move cursor
-  if l:target ==# l:cur
-    call cursor(a:lnum, a:col)
-    normal! zv
-    return
-  endif
-
-  " Check all tabs for a window showing this file
-  for l:tab in range(1, tabpagenr('$'))
-    for l:win_bufnr in tabpagebuflist(l:tab)
-      if fnamemodify(bufname(l:win_bufnr), ':p') ==# l:target
-        execute 'tabnext' l:tab
-        execute bufwinnr(l:win_bufnr) . 'wincmd w'
-        call cursor(a:lnum, a:col)
-        normal! zv
-        return
-      endif
-    endfor
-  endfor
-
-  " Not open anywhere — new tab
-  execute 'tabedit ' . fnameescape(l:target)
-  call cursor(a:lnum, a:col)
-  normal! zv
-endfunction
-
-" YCM helper: run a YCM command and capture the jump via s:GotoLocation
+" IDE: YCM goto with tab reuse
 function! s:YcmGoto(cmd)
   let l:orig_file = expand('%:p')
   let l:orig_pos = getpos('.')
@@ -179,11 +147,25 @@ function! s:YcmGoto(cmd)
   let l:new_file = expand('%:p')
   let l:new_pos = getpos('.')
   if l:new_file !=# l:orig_file || l:new_pos != l:orig_pos
-    " YCM jumped — undo its jump and redo via our tab-reuse logic
     execute 'buffer ' . bufnr(l:orig_file)
     call setpos('.', l:orig_pos)
-    call s:GotoLocation(l:new_file, l:new_pos[1], l:new_pos[2])
+    call helpers#goto_location(l:new_file, l:new_pos[1], l:new_pos[2])
   endif
+endfunction
+
+function! s:TryYcm(cmds)
+  if exists(':YcmCompleter') != 2 | return 0 | endif
+  try
+    let l:avail = py3eval('ycm_state.GetDefinedSubcommands()')
+    for l:cmd in a:cmds
+      if index(l:avail, l:cmd) >= 0
+        call s:YcmGoto(l:cmd)
+        return 1
+      endif
+    endfor
+  catch
+  endtry
+  return 0
 endfunction
 
 " LSP goto with tab reuse
@@ -197,7 +179,7 @@ lua << EOF
         local item = result.items[1]
         local target = item.filename or (item.bufnr and vim.api.nvim_buf_get_name(item.bufnr))
         if not target then return end
-        vim.fn['s:GotoLocation'](target, item.lnum or 1, item.col or 1)
+        vim.fn['helpers#goto_location'](target, item.lnum or 1, item.col or 1)
       end,
     })
   end
@@ -212,17 +194,8 @@ function! JumpToDefinition()
     return
   endif
 
-  if exists(':YcmCompleter') == 2
-    try
-      let l:cmds = py3eval('ycm_state.GetDefinedSubcommands()')
-      for l:cmd in ['GoTo', 'GoToDefinition', 'GoToDeclaration']
-        if index(l:cmds, l:cmd) >= 0
-          call s:YcmGoto(l:cmd)
-          return
-        endif
-      endfor
-    catch
-    endtry
+  if s:TryYcm(['GoTo', 'GoToDefinition', 'GoToDeclaration'])
+    return
   endif
 
   try
@@ -240,20 +213,13 @@ function! GoToInclude()
     return
   endif
 
-  if exists(':YcmCompleter') == 2
-    try
-      let l:cmds = py3eval('ycm_state.GetDefinedSubcommands()')
-      if index(l:cmds, 'GoToInclude') >= 0
-        call s:YcmGoto('GoToInclude')
-        return
-      endif
-    catch
-    endtry
+  if s:TryYcm(['GoToInclude'])
+    return
   endif
 
   let l:file = expand('<cfile>')
   if filereadable(l:file)
-    call s:GotoLocation(l:file, 1, 1)
+    call helpers#goto_location(l:file, 1, 1)
   else
     execute "normal! \<c-w>gf"
   endif
@@ -287,7 +253,7 @@ endfunction
 
 
 " IDE: jedi call signatures (Python, via floating window)
-if has('python3') && has('nvim')
+if has('python3') && has('nvim') && !(exists('g:native_lsp') && g:native_lsp)
   execute 'command! -nargs=1 PythonJedi python3 <args>'
 
   augroup jedi_init | au!

@@ -50,14 +50,15 @@ cmp.setup.cmdline(':', {
 
 local servers = vim.g.lsp_servers or {}
 if #servers > 0 then
+  local lsp_attach = require('lsp-on-attach')
   local capabilities = require('cmp_nvim_lsp').default_capabilities(
     vim.lsp.protocol.make_client_capabilities()
   )
 
-  for _, lsp in ipairs(servers) do
-    require('lspconfig')[lsp].setup({
+  for _, srv in ipairs(servers) do
+    require('lspconfig')[srv].setup({
       capabilities = capabilities,
-      on_attach = on_attach
+      on_attach = lsp_attach.on_attach
     })
   end
 end
