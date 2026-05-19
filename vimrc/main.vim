@@ -9,21 +9,19 @@ endif
 
 let g:largefile_trigger_size=0.5
 
-if exists('t_8f')
+if exists('+t_8f')
   let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 endif
 
-if exists('t_8b')
+if exists('+t_8b')
   let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 endif
 
 set termguicolors
 
-if has('nvim-0.2')
+if has('nvim')
   set guicursor=
-else
-  let $NVIM_TUI_ENABLE_CURSOR_SHAPE = 0
-endif  " has('nvim-0.2')
+endif
 
 " disable some default plugins
 let g:loaded_2html_plugin     = 1
@@ -33,7 +31,7 @@ let g:loaded_getscriptPlugin  = 1
 let g:loaded_logipat          = 1
 let g:loaded_rrhelper         = 1
 let g:loaded_vimballPlugin    = 1
-let g:python_host_skip_check  = 1
+let g:python3_host_skip_check = 1
 
 
 call plug#begin(g:vim_plug_dir)
@@ -98,15 +96,15 @@ call plug#begin(g:vim_plug_dir)
 
   Plug 'https://github.com/romainl/vim-qf'
 
-  if (!exists('g:lsp_servers') || empty(g:lsp_servers)) && has('python3')
+  if exists('g:use_ycm') && g:use_ycm && has('python3')
     let s:ycm_install = "'./install.py --clangd-completer"
 
-    if executable('rustc') | let s:ycm_install .= ' --racer-completer' | endif
-    if executable('go') | let s:ycm_install .= ' --gocode-completer' | endif
-    if executable('node') | let s:ycm_install .= ' --tern-completer' | endif
+    if executable('rustc') | let s:ycm_install .= ' --rust-completer' | endif
+    if executable('go') | let s:ycm_install .= ' --go-completer' | endif
+    if executable('node') | let s:ycm_install .= ' --ts-completer' | endif
 
-    if v:version >= 742 || has('nvim')
-      execute "Plug 'https://github.com/Valloric/YouCompleteMe', "
+    if v:version >= 800 || has('nvim')
+      execute "Plug 'https://github.com/ycm-core/YouCompleteMe', "
         \. "{ 'do': " . s:ycm_install . "' }"
 
       Plug 'https://github.com/rdnetto/YCM-Generator',
@@ -216,7 +214,6 @@ call plug#begin(g:vim_plug_dir)
 
 " Tmux integration                                                         {{{
   Plug 'https://github.com/christoomey/vim-tmux-navigator'
-  Plug 'https://github.com/tmux-plugins/vim-tmux-focus-events'
 " }}}
 
 " Git integration                                                          {{{
@@ -239,7 +236,7 @@ call plug#begin(g:vim_plug_dir)
 
   Plug 'https://github.com/mtth/scratch.vim'
 
-  Plug 'https://github.com/terryma/vim-multiple-cursors'
+  Plug 'https://github.com/mg979/vim-visual-multi', { 'branch': 'master' }
 " }}}
 
 " More power for code editing                                              {{{
@@ -262,19 +259,21 @@ call plug#begin(g:vim_plug_dir)
     \ { 'on': 'Neomake' }
 " }}}
 
-" IDE features (nvim-lsp stack, activated by g:lsp_servers)                 {{{
+" IDE features                                                             {{{
   if has('nvim-0.9')
     Plug 'https://github.com/nvim-lua/plenary.nvim'
     Plug 'nvim-treesitter/nvim-treesitter'
+  endif
 
+  if has('nvim-0.9') && (!exists('g:use_ycm') || !g:use_ycm)
     Plug 'hrsh7th/cmp-cmdline', { 'branch': 'main' }
     Plug 'hrsh7th/cmp-buffer', { 'branch': 'main' }
     Plug 'hrsh7th/cmp-path', { 'branch': 'main' }
     Plug 'hrsh7th/nvim-cmp', { 'branch': 'main' }
   endif
 
-  if has('nvim-0.11')
-    Plug 'https://github.com/jose-elias-alvarez/null-ls.nvim',
+  if has('nvim-0.11') && (!exists('g:use_ycm') || !g:use_ycm)
+    Plug 'https://github.com/nvimtools/none-ls.nvim',
       \ { 'branch': 'main' }
 
     Plug 'nvim-telescope/telescope-fzf-native.nvim',
@@ -301,6 +300,8 @@ call plug#begin(g:vim_plug_dir)
 
 silent! call plug#end()
 
+let g:native_lsp = exists('g:lsp_servers') && !empty(g:lsp_servers)
+      \ && (!exists('g:use_ycm') || !g:use_ycm) && has('nvim-0.11')
 
 if !has('nvim')
   echohl WarningMsg | echom "Neovim isn't available, running vim..." | echohl None
@@ -320,15 +321,15 @@ if has('nvim-0.12') && HasPlug('nvim-treesitter')
   lua require('treesitter-options')
 endif
 
-if has('nvim-0.11') && HasPlug('telescope.nvim')
+if g:native_lsp && HasPlug('telescope.nvim')
   lua require('telescope-options')
 endif
 
-if has('nvim-0.11') && HasPlug('null-ls.nvim')
+if g:native_lsp && HasPlug('null-ls.nvim')
   lua require("null-ls-options")
 endif
 
-if has('nvim-0.11') && HasPlug('nvim-lspconfig')
+if g:native_lsp && HasPlug('nvim-lspconfig')
       \ && HasPlug('cmp-nvim-lsp') && HasPlug('nvim-cmp')
   lua require("cmp-nvim-lsp-options")
 endif

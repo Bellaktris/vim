@@ -48,3 +48,39 @@ endfunction
 
 nmap <silent> <Plug>(SmartGoTo) :call SmartGoTo()<cr>
 
+" Wire g:lsp_servers into YCM's g:ycm_language_server.
+" Servers with built-in YCM support (clangd, gopls, rust-analyzer, tsserver)
+" are handled by YCM's install flags and don't need entries here.
+let s:ycm_builtin = ['clangd', 'gopls', 'rust_analyzer', 'ts_ls', 'tsserver']
+let s:ycm_server_map = {
+  \ 'pyright':   {'cmd': ['pyright-langserver', '--stdio'], 'ft': ['python']},
+  \ 'pylsp':     {'cmd': ['pylsp'],                         'ft': ['python']},
+  \ 'lua_ls':    {'cmd': ['lua-language-server'],           'ft': ['lua']},
+  \ 'bashls':    {'cmd': ['bash-language-server', 'start'], 'ft': ['sh', 'bash', 'zsh']},
+  \ 'vimls':     {'cmd': ['vim-language-server', '--stdio'], 'ft': ['vim']},
+  \ 'jsonls':    {'cmd': ['vscode-json-language-server', '--stdio'], 'ft': ['json']},
+  \ 'yamlls':    {'cmd': ['yaml-language-server', '--stdio'], 'ft': ['yaml']},
+  \ 'cssls':     {'cmd': ['vscode-css-language-server', '--stdio'], 'ft': ['css', 'scss', 'less']},
+  \ 'html':      {'cmd': ['vscode-html-language-server', '--stdio'], 'ft': ['html']},
+  \ }
+
+if exists('g:lsp_servers') && !empty(g:lsp_servers)
+  if !exists('g:ycm_language_server')
+    let g:ycm_language_server = []
+  endif
+
+  for s:srv in g:lsp_servers
+    if index(s:ycm_builtin, s:srv) >= 0
+      continue
+    endif
+    if has_key(s:ycm_server_map, s:srv)
+      let s:cfg = s:ycm_server_map[s:srv]
+      call add(g:ycm_language_server, {
+        \ 'name': s:srv,
+        \ 'cmdline': s:cfg.cmd,
+        \ 'filetypes': s:cfg.ft,
+        \ })
+    endif
+  endfor
+endif
+

@@ -98,10 +98,10 @@ set path+=~/c++/include,~/fbsource/fbcode
 
 " wildignore
 set wildignore=*.o,*~,*.pyc
-if has("win16") || has("win32")
-    set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store
-else
+if has("win32")
     set wildignore+=.git\*,.hg\*,.svn\*
+else
+    set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store
 endif
 
 
@@ -167,7 +167,7 @@ augroup END
 " make file executable if it contains shebang
 function! MakeExecutable()
   if getline(1) =~ "^#!"
-    silent !chmod +x %
+    call system('chmod +x ' . shellescape(expand('%:p')))
   endif
 endfunction
 
@@ -247,10 +247,6 @@ endif
 
 
 " neovim reasonable mappings
-if !exists('$NVIM_TUI_ENABLE_TRUE_COLOR')
-    let $NVIM_TUI_ENABLE_TRUE_COLOR=1
-endif
-
 if has('nvim')
     tnoremap <C-w>h <C-\><C-n><C-w>h
     tnoremap <C-w>j <C-\><C-n><C-w>j

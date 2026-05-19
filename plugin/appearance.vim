@@ -29,14 +29,6 @@ colorscheme starsky
 " endif
 
 
-" Disable scrollbars (real hackers
-" don't use scrollbars for navigation!)
-set guioptions-=r
-set guioptions-=R
-set guioptions-=l
-set guioptions-=L
-
-
 " Window splitter
 set fillchars=vert:│
 
@@ -59,8 +51,8 @@ let g:colorcolumn=80
 set colorcolumn=80
 
 
-" LSP diagnostics
-if exists('g:lsp_servers') && !empty(g:lsp_servers) && has('nvim')
+" LSP diagnostics (native LSP only; YCM handles its own signs)
+if exists('g:native_lsp') && g:native_lsp
   set cmdheight=0
 
   if has("nvim-0.5.0") || has("patch-8.1.1564")

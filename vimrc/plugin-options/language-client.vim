@@ -1,3 +1,7 @@
+" LanguageClient-neovim is not installed — these settings are inactive.
+" Kept as reference for potential future use.
+finish
+
 let g:LanguageClient_diagnosticsDisplay =
       \ {
       \   1: {
@@ -28,10 +32,10 @@ let g:LanguageClient_diagnosticsDisplay =
 
 let g:LanguageClient_serverCommands =
     \ {
-    \     'python': ['/usr/local/bin/pyls'],
-    \     'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
-    \     'javascript': ['/usr/local/bin/javascript-typescript-stdio'],
-    \     'javascript.jsx': ['tcp://127.0.0.1:2089'],
+    \     'python': ['pylsp'],
+    \     'rust': ['rust-analyzer'],
+    \     'javascript': ['typescript-language-server', '--stdio'],
+    \     'javascript.jsx': ['typescript-language-server', '--stdio'],
     \ }
 
 let g:LanguageClient_hasSnippetSupport = 0

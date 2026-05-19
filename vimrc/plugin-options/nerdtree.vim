@@ -1,7 +1,4 @@
-let g:netrw_localrmdir='rm -r'
-
 let g:NERDTreeWinPos = "right"
-let NERDTreeShowHidden=0
 let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '__pycache__',
                    \'\.git', '\.hg', '\.svn', '\.bzr']
 let g:NERDTreeWinSize=35

@@ -63,11 +63,11 @@ function! helpers#find_git_root(...)
     if exists('*FindRootDirectory')
         let s:rootdir = FindRootDirectory(l:count)
     else
-        if exists('*fugitive#repo')
-            try
-              let s:rootdir = fugitive#repo().tree()
-            catch
-            endtry
+        if exists('*FugitiveGitDir')
+            let s:git_dir = FugitiveGitDir()
+            if !empty(s:git_dir)
+              let s:rootdir = fnamemodify(s:git_dir, ':h')
+            endif
         elseif executable('git')
             let s:rootdir = system('git rev-parse --show-toplevel 2> /dev/null')[:-2]
         endif

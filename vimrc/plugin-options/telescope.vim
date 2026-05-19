@@ -1,4 +1,4 @@
-if !exists('g:lsp_servers') || empty(g:lsp_servers) || !has('nvim-0.11')
+if !exists('g:native_lsp') || !g:native_lsp
   finish
 endif
 

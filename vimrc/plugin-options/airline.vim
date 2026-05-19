@@ -28,11 +28,11 @@ let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
 
 let g:airline_extensions = ['tabline', 'branch', 'tagbar']
 
-if exists('g:lsp_servers') && !empty(g:lsp_servers) && has('nvim')
+if exists('g:use_ycm') && g:use_ycm && has('python3')
+  let g:airline_extensions += ['ycm']
+elseif exists('g:lsp_servers') && !empty(g:lsp_servers) && has('nvim')
   let g:airline_extensions += ['nvimlsp']
   let g:airline#extensions#nvimlsp#enabled = 1
   let g:airline#extensions#nvimlsp#error_symbol = "✘"
   let g:airline#extensions#nvimlsp#warning_symbol = '!'
-elseif has('python3')
-  let g:airline_extensions += ['ycm']
 endif

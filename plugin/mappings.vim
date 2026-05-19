@@ -69,7 +69,7 @@ endfunction
 vnoremap <silent> <s-space> :<c-u>call AddSpacesAround()<cr>
 noremap <silent> <s-space> v:<c-u>call AddSpacesAround()<cr>
 
-if &clipboard[:10] == 'unnamedplus'
+if &clipboard =~# 'unnamedplus'
     xnoremap <silent> <expr> p
           \ ':<c-u>silent! call EasyClip#Paste#PasteTextVisualMode(''+'',1)<cr>'
     xnoremap <silent> <expr> P
@@ -78,26 +78,24 @@ if &clipboard[:10] == 'unnamedplus'
     nnoremap <silent> s :<c-u>silent! call EasyClip#Substitute#OnPreSubstitute('+', 1)<cr>:silent! set opfunc=EasyClip#Substitute#SubstituteMotion<cr>g@
 
     nnoremap <silent> S :<c-u>silent! call EasyClip#Substitute#SubstituteLine('+', 1)<cr>:silent! call repeat#set("\<plug>SubstituteLine")<cr>
+elseif &clipboard =~# 'unnamed'
+    xnoremap <silent> <expr> p
+          \ ':<c-u>silent! call EasyClip#Paste#PasteTextVisualMode(''*'',1)<cr>'
+    xnoremap <silent> <expr> P
+          \ ':<c-u>silent! call EasyClip#Paste#PasteTextVisualMode(''*'',1)<cr>'
+
+    nnoremap <silent> s :<c-u>silent! call EasyClip#Substitute#OnPreSubstitute('*', 1)<cr>:silent! set opfunc=EasyClip#Substitute#SubstituteMotion<cr>g@
+
+    nnoremap <silent> S :<c-u>silent! call EasyClip#Substitute#SubstituteLine('*', 1)<cr>:silent! call repeat#set("\<plug>SubstituteLine")<cr>
 else
-    if &clipboard[:6] == 'unnamed'
-        xnoremap <silent> <expr> p
-              \ ':<c-u>silent! call EasyClip#Paste#PasteTextVisualMode(''*'',1)<cr>'
-        xnoremap <silent> <expr> P
-              \ ':<c-u>silent! call EasyClip#Paste#PasteTextVisualMode(''*'',1)<cr>'
+    xnoremap <silent> <expr> p
+          \ ':<c-u>silent! call EasyClip#Paste#PasteTextVisualMode(''"'',1)<cr>'
+    xnoremap <silent> <expr> P
+          \ ':<c-u>silent! call EasyClip#Paste#PasteTextVisualMode(''"'',1)<cr>'
 
-        nnoremap <silent> s :<c-u>silent! call EasyClip#Substitute#OnPreSubstitute('*', 1)<cr>:silent! set opfunc=EasyClip#Substitute#SubstituteMotion<cr>g@
+    nnoremap <silent> s :<c-u>silent! call EasyClip#Substitute#OnPreSubstitute('"', 1)<cr>:silent! set opfunc=EasyClip#Substitute#SubstituteMotion<cr>g@
 
-        nnoremap <silent> S :<c-u>silent! call EasyClip#Substitute#SubstituteLine('*', 1)<cr>:silent! call repeat#set("\<plug>SubstituteLine")<cr>
-    else
-        xnoremap <silent> <expr> p
-              \ ':<c-u>silent! call EasyClip#Paste#PasteTextVisualMode(''"'',1)<cr>'
-        xnoremap <silent> <expr> P
-              \ ':<c-u>silent! call EasyClip#Paste#PasteTextVisualMode(''"'',1)<cr>'
-
-        nnoremap <silent> s :<c-u>silent! call EasyClip#Substitute#OnPreSubstitute('"', 1)<cr>:silent! set opfunc=EasyClip#Substitute#SubstituteMotion<cr>g@
-
-        nnoremap <silent> S :<c-u>silent! call EasyClip#Substitute#SubstituteLine('"', 1)<cr>:silent! call repeat#set("\<plug>SubstituteLine")<cr>
-    endif
+    nnoremap <silent> S :<c-u>silent! call EasyClip#Substitute#SubstituteLine('"', 1)<cr>:silent! call repeat#set("\<plug>SubstituteLine")<cr>
 endif
 
 nmap <c-n> <plug>EasyClipSwapPasteForward
@@ -124,7 +122,7 @@ noremap <silent> <leader>cc :let &colorcolumn = g:colorcolumn - &colorcolumn<cr>
 
 " Filesystem and code navigation
 function! s:JumpToDefinition()
-  if exists('g:lsp_servers') && !empty(g:lsp_servers) && has('nvim-0.11')
+  if exists('g:native_lsp') && g:native_lsp
     lua lsp_jump_to_tab()
   elseif exists(':YcmCompleter') == 2
     call SmartGoTo()

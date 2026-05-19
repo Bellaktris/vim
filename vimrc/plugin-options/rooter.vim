@@ -164,7 +164,7 @@ function! s:RootDirectory(count)
   return root_dir
 endfunction
 
-function! s:ChangeToRootDirectory()
+function! s:ChangeToRootDirectory(count)
   let s:fd = expand('%:p')
 
   if g:rooter_resolve_links

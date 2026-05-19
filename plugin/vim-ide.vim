@@ -41,11 +41,6 @@ if exists(':Alias')
     call Alias(0, 'debug', 'Debug')
 endif
 
-command! -nargs=1 Timeout call s:TimeoutFunc(<f-args>)
-if exists(':Alias')
-    call Alias(0, 'timeout', 'Timeout')
-endif
-
 function! s:ReleaseFunc(...)
     let g:ide_mode = 'release'
     let g:bexec_filter_types['cpp'] = g:bexec_cpp_script
@@ -60,9 +55,6 @@ function! s:DebugFunc(...)
         \. ' --args="' . g:ide_compiler_arglist . '" -m "' . g:ide_mode . '"'
     let g:bexec_filter_types['rust'] = g:bexec_rust_script
         \. ' --args="' . g:ide_compiler_arglist . '" -m "' . g:ide_mode . '"'
-endfunction
-
-function! s:TimeoutFunc(...)
 endfunction
 
 command! -nargs=? Stdin call s:StdinFunc(<f-args>)

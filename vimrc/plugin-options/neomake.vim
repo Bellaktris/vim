@@ -53,7 +53,7 @@ if has('nvim')
     " C++ {{{
     let g:neomake_cpp_clangcheck_maker = {
         \ 'exe': 'clang-check',
-        \ 'args': ['-extra-arg-before=-std=c++1z',
+        \ 'args': ['-extra-arg-before=-std=c++17',
         \          '-extra-arg-before=-I/usr/local/include/Eigen',
         \          '-extra-arg-before=-I'.expand('~').'/.files/c++/include'],
         \ 'errorformat':
@@ -71,7 +71,7 @@ if has('nvim')
 
     let g:neomake_cpp_clangtidy_maker = {
         \ 'exe': 'clang-tidy',
-        \ 'args': ['-extra-arg-before=-std=c++1z',
+        \ 'args': ['-extra-arg-before=-std=c++17',
         \          '-extra-arg-before=-I/usr/local/include/Eigen',
         \          '-extra-arg-before=-I'.expand('~').'/.files/c++/include'],
         \ 'errorformat':

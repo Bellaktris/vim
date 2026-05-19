@@ -1,9 +1,9 @@
-let g:multi_cursor_use_default_mapping=0
+let g:VM_default_mappings = 0
 
-let g:multi_cursor_next_key='<c-n>'
-let g:multi_cursor_prev_key='<c-p>'
-let g:multi_cursor_skip_key='<c-x>'
-let g:multi_cursor_quit_key='<esc>'
+let g:VM_maps = {}
+let g:VM_maps['Find Under']         = '<C-n>'
+let g:VM_maps['Find Subword Under'] = '<C-n>'
+let g:VM_maps['Skip Region']        = '<C-x>'
+let g:VM_maps['Remove Region']      = '<C-p>'
 
-let g:multi_cursor_exit_from_insert_mode = 0
-let g:multi_cursor_exit_from_visual_mode = 0
+let g:VM_quit_after_leaving_insert_mode = 0
