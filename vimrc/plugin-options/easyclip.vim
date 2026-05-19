@@ -1,7 +1,7 @@
-if $SSH_TTY != ''
-  let &clipboard=""
-else
+if has('nvim') || $SSH_TTY == ''
   let &clipboard="unnamed"
+else
+  let &clipboard=""
 endif
 
 let g:EasyClipUseYankDefaults = 0

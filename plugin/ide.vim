@@ -52,7 +52,7 @@ function! s:RebuildBuildSystems()
   endif
 
   let g:build_systems['BUILD'] =
-    \'blaze build --color=no --curses=no'
+    \'blaze build @mode/' . l:buck_mode . ' --color=no --curses=no'
 
   let g:build_systems['TARGETS'] =
     \'buck build @mode/' . l:buck_mode

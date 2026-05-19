@@ -39,10 +39,24 @@ command! -nargs=1 XTabedit call helpers#open_new_or_existing(<f-args>)
 
 
 " Clipboard
-if $SSH_TTY != ""
-  set clipboard=""
-else
+if has('nvim') || $SSH_TTY == ''
   set clipboard=unnamed,unnamedplus
+else
+  set clipboard=
+endif
+
+" OSC 52: propagate yanks to local clipboard over SSH (vim only;
+" neovim uses its built-in OSC 52 provider automatically)
+if !has('nvim') && $SSH_TTY != ''
+  function! s:Osc52Yank()
+    let text = join(v:event.regcontents, "\n")
+    let encoded = system('base64 | tr -d "\n"', text)
+    call writefile(["\x1b]52;c;" . encoded . "\x07"], '/dev/tty', 'b')
+  endfunction
+
+  augroup osc52_yank | au!
+    autocmd TextYankPost * call s:Osc52Yank()
+  augroup END
 endif
 
 " File types and paths
