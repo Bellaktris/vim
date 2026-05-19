@@ -12,19 +12,19 @@ let g:ide_arglist = join(readfile(g:ide_stdargs), ' ')
 let g:ide_compiler_arglist = join(readfile(g:ide_compiler_stdargs), ' ')
 let g:ide_mode = 'release'
 
-let g:bexec_args = g:ide_arglist . " < " . g:ide_stdin
-let g:bexec_cpp_script = '/usr/bin/env python3 ' . g:root_dir . '/bexec/cpp.py'
-let g:bexec_rust_script = '/usr/bin/env python3 ' . g:root_dir . '/bexec/rust.py'
-let g:bexec_filter_types = {}
+let g:ide_run_args = g:ide_arglist . " < " . g:ide_stdin
+let g:ide_cpp_runner = '/usr/bin/env python3 ' . g:root_dir . '/runners/cpp.py'
+let g:ide_rust_runner = '/usr/bin/env python3 ' . g:root_dir . '/runners/rust.py'
+let g:ide_runners = {}
 
-function! s:RebuildBexecTypes()
-  for [s:lang, s:script] in [['cpp', g:bexec_cpp_script], ['rust', g:bexec_rust_script]]
-    let g:bexec_filter_types[s:lang] = s:script
+function! s:RebuildRunners()
+  for [s:lang, s:script] in [['cpp', g:ide_cpp_runner], ['rust', g:ide_rust_runner]]
+    let g:ide_runners[s:lang] = s:script
           \. ' --args="' . g:ide_compiler_arglist . '" -m "' . g:ide_mode . '"'
   endfor
 endfunction
 
-call s:RebuildBexecTypes()
+call s:RebuildRunners()
 
 augroup ide_file_hooks | au!
   au BufLeave,BufWrite */ide-stdargs call UpdateStdargs()
@@ -35,7 +35,7 @@ augroup END
 " IDE: release/debug mode
 function! s:SetMode(mode)
   let g:ide_mode = a:mode
-  call s:RebuildBexecTypes()
+  call s:RebuildRunners()
 endfunction
 
 command! Release call s:SetMode('release')
@@ -53,17 +53,17 @@ endif
 " IDE: stdin/stdargs/ccargs
 function! UpdateStdargs()
   let g:ide_arglist = join(readfile(g:ide_stdargs), ' ')
-  let g:bexec_args = g:ide_arglist . " < " . g:ide_stdin
+  let g:ide_run_args = g:ide_arglist . " < " . g:ide_stdin
 endfunction
 
 function! CCargsRead()
   let g:ide_compiler_arglist = join(readfile(g:ide_compiler_stdargs), ' ')
-  call s:RebuildBexecTypes()
+  call s:RebuildRunners()
 endfunction
 
 command! -nargs=? Stdin
       \ if <q-args> != '' | let g:ide_stdin = glob(<q-args>) | endif
-      \ | let g:bexec_args = g:ide_arglist . " < " . g:ide_stdin
+      \ | let g:ide_run_args = g:ide_arglist . " < " . g:ide_stdin
       \ | exec 'tabedit ' . g:ide_stdin
 
 command! -nargs=? Stdargs
@@ -81,19 +81,19 @@ function! s:ExecuteFile()
 
   let l:width = max([helpers#free_hspace(), 40])
 
-  if has_key(g:bexec_filter_types, &filetype)
-    let l:cmd = g:bexec_filter_types[&filetype]
+  if has_key(g:ide_runners, &filetype)
+    let l:cmd = g:ide_runners[&filetype]
           \ . ' ' . shellescape(expand('%:p'))
-          \ . ' ' . g:bexec_args
+          \ . ' ' . g:ide_run_args
   else
     let l:shebang = helpers#parse_shebang()
     if l:shebang.exe != ''
       let l:cmd = l:shebang.exe . ' ' . join(l:shebang.args)
             \ . ' ' . shellescape(expand('%:p'))
-            \ . ' ' . g:bexec_args
+            \ . ' ' . g:ide_run_args
     else
       let l:cmd = shellescape(expand('%:p'))
-            \ . ' ' . g:bexec_args
+            \ . ' ' . g:ide_run_args
     endif
   endif
 
