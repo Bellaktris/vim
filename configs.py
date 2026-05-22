@@ -31,6 +31,9 @@ if !exists('g:root_dir')
   endif
 
   let g:use_ycm = 1
+  let g:lsp_servers = []
+  if executable('pyright-langserver') | call add(g:lsp_servers, 'pyright') | endif
+
   let g:root_dir = "{ROOTDIR}"
   let g:vim_plug_dir = "{PLUGDIR}"
 
