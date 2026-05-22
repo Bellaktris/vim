@@ -53,7 +53,7 @@ if has('nvim')
     " C++ {{{
     let g:neomake_cpp_clangcheck_maker = {
         \ 'exe': 'clang-check',
-        \ 'args': ['-extra-arg-before=-std=c++17',
+        \ 'args': ['-extra-arg-before=-std=c++2c',
         \          '-extra-arg-before=-I/usr/local/include/Eigen',
         \          '-extra-arg-before=-I'.expand('~').'/.files/c++/include'],
         \ 'errorformat':
@@ -90,8 +90,8 @@ if has('nvim')
     endfunction
 
     let g:neomake_cpp_cpplint_maker = {
-        \ 'exe': 'python3',
-        \ 'args': ['-m', 'cpplint'],
+        \ 'exe': 'cpplint',
+        \ 'args': [],
         \ 'errorformat': '%A%f:%l:  %m [%t],%-G%.%#',
         \ 'postprocess': function('s:NeomakeCpplintPostProcess')
     \ }
@@ -125,12 +125,9 @@ if has('nvim')
     " }}}
 
     " Python {{{
-    let g:neomake_python_exe = 'python3'
-
     let g:neomake_python_pylint_maker = {
-        \ 'exe': g:neomake_python_exe,
+        \ 'exe': 'pylint',
         \ 'args': [
-            \ '-m', 'pylint',
             \ '--output-format=text',
             \ '--msg-template="{path}:{line}:{column}:{C}: [{symbol}] {msg}"',
             \ '--reports=no'
@@ -145,8 +142,8 @@ if has('nvim')
     \ }
 
     let g:neomake_python_flake8_maker = {
-        \ 'exe': g:neomake_python_exe,
-        \ 'args': ['-m', 'flake8'],
+        \ 'exe': 'flake8',
+        \ 'args': [],
         \ 'errorformat':
             \ '%E%f:%l: could not compile,%-Z%p^,' .
             \ '%A%f:%l:%c: %t%n %m,' .

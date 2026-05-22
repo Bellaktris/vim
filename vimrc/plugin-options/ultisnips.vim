@@ -30,8 +30,7 @@ function! g:UltiSnips_JumpBackward()
 endfunction
 
 let g:UltiSnipsExpandTrigger = "<s-cr>"
-
-inoremap <s-cr> <right><left>
+let g:UltiSnipsInsertTriggerOnNoMatch = 0
 
 let b:did_after_plugin_ultisnips_after = 1
 

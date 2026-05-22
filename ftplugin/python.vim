@@ -3,11 +3,6 @@ setlocal foldmethod=indent
 setlocal tabstop=2
 setlocal shiftwidth=2
 
-if helpers#parse_shebang().exe ==# 'python'
-  let b:neomake_python_pylint_exe = 'python'
-  let b:neomake_python_flake8_exe = 'python'
-endif
-
 call helpers#setup_goto_mappings()
 
 if !exists('g:lsp_servers') || empty(g:lsp_servers)
