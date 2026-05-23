@@ -14,6 +14,14 @@ let g:airline#extensions#whitespace#checks = []
 
 let g:airline_powerline_fonts = 1
 
+" No separator character between sections. Powerline filled triangles render
+" as opaque foreground glyphs even when iTerm2's transparency makes the
+" section bgs semi-transparent, so the triangle visually pops out of the
+" rest of the line. Dropping the character lets sections abut directly; each
+" section's bg picks up the same terminal transparency uniformly.
+let g:airline_left_sep  = ''
+let g:airline_right_sep = ''
+
 if has('gui') || exists('&termguicolors')
                \ && &termguicolors == 1
   let g:airline_theme="luna"
