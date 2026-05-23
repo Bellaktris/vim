@@ -5,6 +5,10 @@ let b:surround_{char2nr("c")} = "\\\1command: \1{\r}"
 nmap <silent><buffer> <plug>(view-compilation-status) :execute 'lcd '
       \.b:vimtex['root']<cr>:silent! VimtexErrors<cr>
 
+" <leader>le is now diagnostics (helpers#open_diagnostics); keep tex's
+" vimtex compilation status reachable under <leader>lc.
+nmap <silent><buffer> <leader>lc <plug>(view-compilation-status)
+
 setlocal conceallevel=0
 setlocal concealcursor=nvic
 

@@ -129,7 +129,11 @@ endfor
 " IDE: execute/view
 nmap <leader>xx <plug>(execute-file)
 nmap <leader>vx <plug>(view-file)
-nmap <leader>le <plug>(view-compilation-status)
+
+" Diagnostics for current buffer in the location list. Works with native LSP,
+" YCM, and neomake (whichever is populating). See helpers#open_diagnostics.
+nnoremap <silent> <leader>le :call helpers#open_diagnostics('E')<cr>
+nnoremap <silent> <leader>lx :call helpers#open_diagnostics('I')<cr>
 
 " IDE: python/shell split
 if empty($TMUX)

@@ -1,4 +1,17 @@
  setlocal nonumber
  setlocal colorcolumn=
 
- nmap <silent><buffer> <cr> :.cc<cr>
+ " Each entry stays on one line; cursor moves past the right edge scroll the
+ " view sideways instead of wrapping.
+ setlocal nowrap
+ setlocal sidescroll=1
+ setlocal sidescrolloff=8
+
+ " <CR> jumps to the entry under the cursor. Use .ll in loclist windows,
+ " .cc in quickfix windows -- hard-coding .cc broke loclist jumps with
+ " E42: No Errors.
+ if get(getwininfo(win_getid())[0], 'loclist', 0)
+   nnoremap <silent><buffer> <cr> :.ll<cr>
+ else
+   nnoremap <silent><buffer> <cr> :.cc<cr>
+ endif

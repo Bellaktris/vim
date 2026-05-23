@@ -33,6 +33,67 @@ function! helpers#free_hspace()
     return result > 40 ? result : 40
 endfunction
 
+" Populate the qflist with diagnostics for the current buffer and open it.
+" severity_max: 'E' (errors only) or 'I' (errors + warnings + info).
+" Priority: vim.diagnostic (native LSP) -> YCM (:YcmDiags) -> existing loclist
+" (typically neomake). We populate the qflist rather than the loclist so the
+" jump-from-qf doesn't get clobbered by neomake's BufEnter autocmd (which
+" rewrites the loclist on every buffer enter).
+function! helpers#open_diagnostics(severity_max) abort
+    let l:bufnr = bufnr('')
+    let l:want = a:severity_max ==# 'E' ? ['E'] : ['E', 'W', 'I']
+    let l:Match = {idx, val -> val.bufnr == l:bufnr
+        \ && index(l:want, toupper(val.type)) >= 0}
+
+    if has('nvim') && !empty(luaeval('vim.diagnostic.get(0)'))
+        let l:sev = a:severity_max ==# 'E'
+            \ ? 'vim.diagnostic.severity.ERROR'
+            \ : '{ max = vim.diagnostic.severity.INFO }'
+        let l:items = luaeval(
+            \ 'vim.diagnostic.toqflist(vim.diagnostic.get(0, { severity = '
+            \ . l:sev . ' }))')
+        if !empty(l:items)
+            call setqflist(l:items, 'r')
+            call s:open_qflist_capped()
+            return
+        endif
+    endif
+
+    let l:saved_loc = getloclist(0)
+
+    if exists(':YcmDiags') == 2
+        silent! YcmDiags
+        let l:items = filter(getloclist(0), l:Match)
+        call setloclist(0, l:saved_loc, 'r')
+        if !empty(l:items)
+            call setqflist(l:items, 'r')
+            call s:open_qflist_capped()
+            return
+        endif
+    endif
+
+    let l:items = filter(copy(l:saved_loc), l:Match)
+    if !empty(l:items)
+        call setqflist(l:items, 'r')
+        call s:open_qflist_capped()
+        return
+    endif
+
+    cclose
+    silent! lclose
+    echohl WarningMsg | echom 'No diagnostics' | echohl None
+endfunction
+
+" Open the qflist with height = min(items, 10). Without an explicit height
+" :copen leaves an already-open qf window at its previous size. Also closes
+" any stale loclist window so we don't end up with two qf-style windows.
+function! s:open_qflist_capped() abort
+    let l:n = len(getqflist())
+    if l:n == 0 | return | endif
+    silent! lclose
+    execute 'copen ' . min([l:n, 10])
+endfunction
+
 function! helpers#shellescape(str)
     let esc = '\[\]"#&|<>()@^ \\'."'"
 
