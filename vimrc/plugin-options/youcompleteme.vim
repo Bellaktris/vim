@@ -11,7 +11,11 @@ let g:ycm_complete_in_comments = 1
 let g:ycm_collect_identifiers_from_comments_and_strings = 1
 
 let g:ycm_key_detailed_diagnostics = '<Plug>(ShowDetailedLine)'
-let g:ycm_goto_buffer_command = 'new-or-existing-tab'
+" same-buffer (vs new-or-existing-tab) so YCM replaces the current window's
+" buffer on goto rather than opening its own tab. ide.vim's s:YcmGoto then
+" bounces back to the original and uses helpers#goto_location for tab reuse;
+" letting both layers manage tabs produces a duplicate of the source file.
+let g:ycm_goto_buffer_command = 'same-buffer'
 let g:ycm_add_preview_to_completeopt = 0
 let g:ycm_autoclose_preview_window_after_insertion = 1
 let g:ycm_enable_diagnostic_signs = 1
