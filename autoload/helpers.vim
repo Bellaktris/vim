@@ -278,12 +278,3 @@ function! helpers#setup_goto_mappings()
     nnoremap <silent><buffer> gD :call JumpToDefinition()<cr>
     nnoremap <silent><buffer> g] :call FindReferences()<cr>
 endfunction
-
-function! helpers#setup_grep(tool)
-    if !executable(a:tool) | return | endif
-    execute 'xmap <silent><buffer> <leader>ag y:execute "lcd ".helpers#find_git_root()<cr>'
-          \ . ':exe "Grepper -noprompt -grepprg ' . a:tool . ' -i -s "'
-          \ . '. helpers#shellescape(substitute(@0, ''--'', '''', ''g''))<cr>'
-    execute 'command! -buffer -nargs=* FastGrep execute "Grepper -noprompt -grepprg '
-          \ . a:tool . ' -i -s ".helpers#shellescape(''<args>'')'
-endfunction

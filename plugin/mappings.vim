@@ -109,6 +109,16 @@ noremap <silent> <leader>tb :let g:tagbar_width=helpers#free_hspace()<cr>:Tagbar
 nmap <silent> <leader>gt :Windows<cr>
 nmap <silent> <leader>cp :call helpers#call_from_git_root('FZF')<cr>
 
+" Live grep via fzf.vim's :Rg. <leader>ag scopes to the git root,
+" <leader>gp to the current working directory. Visual-mode variants use the
+" selection as the initial query. When native LSP is on, telescope.vim's
+" plugin-options overrides these with Telescope live_grep using the same
+" scoping, so <leader>ag / <leader>gp work in both modes consistently.
+nmap     <silent> <leader>ag :call helpers#call_from_git_root('Rg')<cr>
+nmap     <silent> <leader>gp :Rg<cr>
+xnoremap <silent> <leader>ag "zy:call helpers#call_from_git_root('Rg ' . @z)<cr>
+xnoremap <silent> <leader>gp "zy:execute 'Rg ' . @z<cr>
+
 nnoremap <silent> <leader>en :call EnMasse()<cr>
 
 noremap <leader>cd :cd %:p:h<cr>:pwd<cr>
