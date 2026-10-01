@@ -4,7 +4,6 @@ let g:vimtex_indent_bib_enabled = 0
 let g:vimtex_mappings_enabled = 0
 
 let g:vimtex_toc_show_preamble = 0
-let g:vimtex_toc_show_numbers = 0
 
 let g:tex_flavor = "latex"
 
@@ -74,6 +73,3 @@ if executable('okular')
 endif
 
 let g:vimtex_view_automatic = 0
-
-let g:vimtex_quickfix_warnings =
-  \ { 'default' : 1, 'underfull' : 0, 'overfull' : 0 }
