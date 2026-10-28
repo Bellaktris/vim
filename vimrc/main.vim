@@ -250,7 +250,10 @@ call plug#begin(g:vim_plug_dir)
 
   Plug 'https://github.com/mtth/scratch.vim'
 
-  Plug 'https://github.com/mg979/vim-visual-multi', { 'branch': 'master' }
+  " nvim 0.13 has multicursor built in, see vimrc/plugin-options/multicursors.vim
+  if !has('nvim-0.13')
+    Plug 'https://github.com/mg979/vim-visual-multi', { 'branch': 'master' }
+  endif
 " }}}
 
 " More power for code editing                                              {{{
