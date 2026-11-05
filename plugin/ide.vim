@@ -254,27 +254,61 @@ endfunction
 
 " IDE: jedi call signatures (Python, via floating window)
 if has('python3') && has('nvim') && !(exists('g:native_lsp') && g:native_lsp)
-  execute 'command! -nargs=1 PythonJedi python3 <args>'
+  function! s:JediBootstrap() abort
+    execute 'python3 import sys, vim'
+    execute "python3 _jedi_root = vim.eval('g:root_dir')"
+    execute 'python3 _jedi_root in sys.path'
+          \ . ' or sys.path.insert(0, _jedi_root)'
+    execute 'python3 import jedi_signatures'
+  endfunction
 
-  augroup jedi_init | au!
-    au FileType python
-          \ execute "python3 sys.path.insert(0, '" . g:root_dir . "')"
-          \| execute "python3 import jedi_signatures"
-          \| au! jedi_init
-  augroup END
+  " The python3 host can restart, and its namespace goes with it. Importing
+  " once from a self-deleting FileType hook meant every later keystroke called
+  " into an undefined module ("NameError: name 'jedi_signatures' is not
+  " defined") with no way back, so import lazily and repair on failure.
+  function! s:JediCall(call) abort
+    try
+      execute 'python3 jedi_signatures.' . a:call
+    catch /E5108\|NameError/
+      try
+        call s:JediBootstrap()
+        execute 'python3 jedi_signatures.' . a:call
+      catch
+        " Genuinely unavailable: stop firing on every keystroke, and say why.
+        autocmd! jedi_signatures
+        echohl WarningMsg
+        echom 'jedi call signatures disabled: ' . v:exception
+        echohl None
+      endtry
+    endtry
+  endfunction
 
   function! s:JediShowCallSignatures()
-    PythonJedi jedi_signatures.show_call_signatures()
+    call s:JediCall('show_call_signatures()')
   endfunction
 
   function! s:JediClearCallSignatures()
-    PythonJedi jedi_signatures.clear_call_signatures()
+    call s:JediCall('clear_call_signatures()')
+  endfunction
+
+  " Registered from a function rather than inline: a '\|' continuation after
+  " an 'au FileType' line lands inside that autocmd's command body instead of
+  " running as its own command, which left InsertLeave re-registering itself
+  " once per keystroke.
+  function! s:JediEnableCallSignatures()
+    augroup jedi_signatures
+      autocmd! * <buffer>
+      " CursorMovedI and TextChangedI are both suppressed while the completion
+      " popup is visible, so TextChangedP is what keeps the float refreshing
+      " while YCM's menu is up.
+      autocmd CursorMovedI,TextChangedP <buffer>
+            \ call s:JediShowCallSignatures()
+      autocmd InsertLeave <buffer> call s:JediClearCallSignatures()
+    augroup END
   endfunction
 
   augroup jedi_signatures | au!
-    au FileType python
-          \ autocmd CursorMovedI <buffer> call s:JediShowCallSignatures()
-          \| autocmd InsertLeave <buffer> call s:JediClearCallSignatures()
+    autocmd FileType python call s:JediEnableCallSignatures()
   augroup END
 endif
 
