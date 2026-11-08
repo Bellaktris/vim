@@ -14,8 +14,8 @@ let g:EasyMotion_do_mapping = 0
 let g:EasyOperator_line_do_mapping = 0
 let g:EasyMotion_do_shade = 0
 
-nmap <silent> <Plug>(easyoperator-line-cut) :call s:CutLines()<cr>
-nmap <silent> <Plug>(easyoperator-line-substitute) :call s:SubstituteLines()<cr>
+nmap <silent> <Plug>(easyoperator-line-cut) :call <SID>CutLines()<cr>
+nmap <silent> <Plug>(easyoperator-line-substitute) :call <SID>SubstituteLines()<cr>
 
 function! s:CutLines()
     let orig_pos = [line('.'), col('.')]

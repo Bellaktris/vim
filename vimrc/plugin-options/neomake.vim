@@ -55,7 +55,7 @@ if has('nvim')
         \ 'exe': 'clang-check',
         \ 'args': ['-extra-arg-before=-std=c++2c',
         \          '-extra-arg-before=-I/usr/local/include/Eigen',
-        \          '-extra-arg-before=-I'.expand('~').'/.files/c++/include'],
+        \          '-extra-arg-before=-I'.expand('~').'/.files/c++/.local/include'],
         \ 'errorformat':
             \ '%-G%f:%s:,' .
             \ '%f:%l:%c: %trror: %m,' .
@@ -71,9 +71,9 @@ if has('nvim')
 
     let g:neomake_cpp_clangtidy_maker = {
         \ 'exe': 'clang-tidy',
-        \ 'args': ['-extra-arg-before=-std=c++17',
+        \ 'args': ['-extra-arg-before=-std=c++2c',
         \          '-extra-arg-before=-I/usr/local/include/Eigen',
-        \          '-extra-arg-before=-I'.expand('~').'/.files/c++/include'],
+        \          '-extra-arg-before=-I'.expand('~').'/.files/c++/.local/include'],
         \ 'errorformat':
             \ '%E%f:%l:%c: fatal error: %m,' .
             \ '%E%f:%l:%c: error: %m,' .

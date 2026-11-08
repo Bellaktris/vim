@@ -56,9 +56,9 @@ def get_compilation_info_for_file(database, filename):
 
 def FlagsForFile(filename, **kwargs):
     current_dir = os.getcwd()
-    flags = ['-Wall', '-fexceptions', '-std=c++1z',
+    flags = ['-Wall', '-fexceptions', '-std=c++2c',
              '-I/usr/local/include/eigen3',
-             '-I' + os.path.expanduser('~/.files/c++/include')]
+             '-I' + os.path.expanduser('~/.files/c++/.local/include')]
 
     if not os.path.exists(current_dir + '/compile_commands.json'):
         database = None

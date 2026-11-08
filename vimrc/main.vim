@@ -116,8 +116,9 @@ call plug#begin(g:vim_plug_dir)
   Plug 'https://github.com/tweekmonster/startuptime.vim',
     \ { 'on': 'StartupTime' }
 
+  " Loaded by the scroller commands in plugin-options/scrollcolor.vim.
   Plug 'https://github.com/vim-scripts/Colour-Sampler-Pack',
-    \ { 'on': 'COLORSCROLL' }
+    \ { 'on': [] }
 " }}}
 
 " Appearance and syntax highlighting                                       {{{
@@ -279,7 +280,12 @@ call plug#begin(g:vim_plug_dir)
 " IDE features                                                             {{{
   if has('nvim-0.9')
     Plug 'https://github.com/nvim-lua/plenary.nvim'
-    Plug 'nvim-treesitter/nvim-treesitter'
+  endif
+
+  " The main branch, which needs nvim 0.12; see lua/treesitter-options.lua.
+  if has('nvim-0.12')
+    Plug 'nvim-treesitter/nvim-treesitter',
+      \ { 'branch': 'main', 'do': ':TSUpdate' }
   endif
 
   if has('nvim-0.9') && (!exists('g:use_ycm') || !g:use_ycm)
@@ -342,7 +348,7 @@ if g:native_lsp && HasPlug('telescope.nvim')
   lua require('telescope-options')
 endif
 
-if g:native_lsp && HasPlug('null-ls.nvim')
+if g:native_lsp && HasPlug('none-ls.nvim')
   lua require("null-ls-options")
 endif
 

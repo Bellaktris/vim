@@ -5,7 +5,8 @@ setlocal shiftwidth=2
 
 call helpers#setup_goto_mappings()
 
-if !exists('g:lsp_servers') || empty(g:lsp_servers)
+" YCM answers GetDoc itself, or through pyright when that is registered.
+if get(g:, 'use_ycm', 0)
   function! CloseOrMakeNewTab()
     if line2byte( line( '$' ) + 1 ) <= 2
       quit

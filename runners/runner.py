@@ -8,8 +8,8 @@ from os.path import getmtime as mtime
 LANGUAGES = {
     'cpp': {
         'compiler': 'clang++',
-        'flags': ['-Wall', '-std=c++2a', '-march=native',
-                  '-I' + os.path.expanduser('~/.files/c++/include'),
+        'flags': ['-Wall', '-std=c++2c', '-march=native',
+                  '-I' + os.path.expanduser('~/.files/c++/.local/include'),
                   '-I/usr/local/include/eigen3', '-lfolly'],
         'release': ['-O3'],
         'debug': ['-g'],

@@ -38,10 +38,16 @@
 if exists("g:scroll_colors") | finish | endif
 let g:scroll_colors = 1
 
-command! COLORSCROLL :call s:ColorScroller()
-command! SCROLLCOLOR :call s:ColorScroller()
-command! NEXTCOLOR   :call s:NextColorscheme()
-command! PREVCOLOR   :call s:PrevColorscheme()
+" Colour-Sampler-Pack is installed lazily (main.vim); load it before scrolling,
+" since its schemes are what there is to scroll through.
+function! s:LoadPack()
+  silent! call plug#load('Colour-Sampler-Pack')
+endfunction
+
+command! COLORSCROLL :call s:LoadPack() | call s:ColorScroller()
+command! SCROLLCOLOR :call s:LoadPack() | call s:ColorScroller()
+command! NEXTCOLOR   :call s:LoadPack() | call s:NextColorscheme()
+command! PREVCOLOR   :call s:LoadPack() | call s:PrevColorscheme()
 
 " Example of convenience mappings:
 "map <silent><F3> :NEXTCOLOR<cr>
@@ -445,8 +451,8 @@ function! s:PrevColorscheme()
     call s:FinalEcho('previous: '.old)
 endfun
 
-command! CN :call s:NextColorscheme()
-command! CP :call s:PrevColorscheme()
+command! CN :call s:LoadPack() | call s:NextColorscheme()
+command! CP :call s:LoadPack() | call s:PrevColorscheme()
 
 " 2006-07-18 fixed bug with Align() -> s:Align() (affected L command)
 " 2006-07-18 added colorlist cache (s:list)

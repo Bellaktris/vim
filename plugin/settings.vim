@@ -61,7 +61,7 @@ endif
 
 " File types and paths
 set ffs=unix,dos,mac
-set path+=~/c++/include,~/fbsource/fbcode
+set path+=~/.local/include,~/fbsource/fbcode
 
 
 " Wildignore

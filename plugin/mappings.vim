@@ -107,17 +107,23 @@ nmap <leader>nt <plug>NerdTreeStart
 noremap <silent> <leader>tb :let g:tagbar_width=helpers#free_hspace()<cr>:TagbarToggle<cr>
 
 nmap <silent> <leader>gt :Windows<cr>
-nmap <silent> <leader>cp :call helpers#call_from_git_root('FZF')<cr>
-
-" Live grep via fzf.vim's :Rg. <leader>ag scopes to the git root,
-" <leader>gp to the current working directory. Visual-mode variants use the
-" selection as the initial query. When native LSP is on, telescope.vim's
-" plugin-options overrides these with Telescope live_grep using the same
-" scoping, so <leader>ag / <leader>gp work in both modes consistently.
-nmap     <silent> <leader>ag :call helpers#call_from_git_root('Rg')<cr>
-nmap     <silent> <leader>gp :Rg<cr>
-xnoremap <silent> <leader>ag "zy:call helpers#call_from_git_root('Rg ' . @z)<cr>
-xnoremap <silent> <leader>gp "zy:execute 'Rg ' . @z<cr>
+" File search and live grep.  <leader>ag scopes to the git root, <leader>gp to
+" the current working directory; the visual-mode variants take the selection
+" as the initial query.  fzf.vim's :FZF and :Rg, or Telescope when native LSP
+" is on (it is only installed then).
+if get(g:, 'native_lsp', 0)
+  nmap     <silent> <leader>cp :execute 'Telescope find_files cwd='.helpers#find_git_root()<cr>
+  nmap     <silent> <leader>ag :execute 'Telescope live_grep cwd='.helpers#find_git_root()<cr>
+  nmap     <silent> <leader>gp :Telescope live_grep<cr>
+  xnoremap <silent> <leader>ag "zy:execute 'Telescope live_grep cwd='.helpers#find_git_root().' default_text='.escape(@z, ' ')<cr>
+  xnoremap <silent> <leader>gp "zy:execute 'Telescope live_grep default_text='.escape(@z, ' ')<cr>
+else
+  nmap     <silent> <leader>cp :call helpers#call_from_git_root('FZF')<cr>
+  nmap     <silent> <leader>ag :call helpers#call_from_git_root('Rg')<cr>
+  nmap     <silent> <leader>gp :Rg<cr>
+  xnoremap <silent> <leader>ag "zy:call helpers#call_from_git_root('Rg ' . @z)<cr>
+  xnoremap <silent> <leader>gp "zy:execute 'Rg ' . @z<cr>
+endif
 
 nnoremap <silent> <leader>en :call EnMasse()<cr>
 

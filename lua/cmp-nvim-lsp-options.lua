@@ -55,10 +55,13 @@ if #servers > 0 then
     vim.lsp.protocol.make_client_capabilities()
   )
 
+  -- nvim-lspconfig only supplies the lsp/<server>.lua defaults now; nvim 0.11+
+  -- merges these on top and starts the server itself.
   for _, srv in ipairs(servers) do
-    require('lspconfig')[srv].setup({
+    vim.lsp.config(srv, {
       capabilities = capabilities,
       on_attach = lsp_attach.on_attach
     })
+    vim.lsp.enable(srv)
   end
 end
