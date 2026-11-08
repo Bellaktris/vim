@@ -1,16 +1,69 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os, sys, subprocess, argparse
+import os, sys, shutil, subprocess, argparse
+from functools import lru_cache
 from subprocess import TimeoutExpired
 from os.path import getmtime as mtime
 
+
+def run_ok(cmd):
+    try:
+        return subprocess.run(cmd, stdin=subprocess.DEVNULL,
+                              stdout=subprocess.DEVNULL,
+                              stderr=subprocess.DEVNULL).returncode == 0
+    except OSError:
+        return False
+
+
+@lru_cache(maxsize=None)
+def cpp_compiler():
+    return 'clang++' if shutil.which('clang++') else 'c++'
+
+
+@lru_cache(maxsize=None)
+def compiler_accepts(*flags):
+    return run_ok([cpp_compiler(), *flags, '-x', 'c++', '-fsyntax-only', '-'])
+
+
+@lru_cache(maxsize=None)
+def pkg_config(*args):
+    try:
+        return subprocess.run(['pkg-config', *args], stdin=subprocess.DEVNULL,
+                              capture_output=True, text=True)
+    except OSError:
+        return None
+
+
+def eigen_flags():
+    proc = pkg_config('--cflags', 'eigen3')
+    if proc is not None and proc.returncode == 0 and proc.stdout.strip():
+        return proc.stdout.split()
+    for path in ('/opt/homebrew/include/eigen3', '/usr/local/include/eigen3',
+                 '/usr/include/eigen3'):
+        if os.path.isdir(path):
+            return ['-I' + path]
+    return []
+
+
+def cpp_flags():
+    std = next((s for s in ('c++2c', 'c++23', 'c++20')
+                if compiler_accepts('-std=' + s)), None)
+    flags = ['-Wall'] + (['-std=' + std] if std else [])
+    if compiler_accepts('-march=native'):
+        flags.append('-march=native')
+    flags += ['-I' + os.path.expanduser('~/.files/c++/.local/include')]
+    flags += eigen_flags()
+    proc = pkg_config('--exists', 'libfolly')
+    if proc is not None and proc.returncode == 0:
+        flags.append('-lfolly')
+    return flags
+
+
 LANGUAGES = {
     'cpp': {
-        'compiler': 'clang++',
-        'flags': ['-Wall', '-std=c++2c', '-march=native',
-                  '-I' + os.path.expanduser('~/.files/c++/.local/include'),
-                  '-I/usr/local/include/eigen3', '-lfolly'],
+        'compiler': cpp_compiler,
+        'flags': cpp_flags,
         'release': ['-O3'],
         'debug': ['-g'],
     },
@@ -50,7 +103,9 @@ os.makedirs(os.path.dirname(binary_path), exist_ok=True)
 
 try:
     if not os.path.exists(binary_path) or mtime(source_file) > mtime(binary_path):
-        cmd = [lang['compiler']] + lang['flags'] + compile_flags
+        compiler, flags = lang['compiler'], lang['flags']
+        cmd = [compiler() if callable(compiler) else compiler]
+        cmd += (flags() if callable(flags) else flags) + compile_flags
         cmd += [source_file, '-o', binary_path]
 
         proc = subprocess.Popen(cmd, stdin=None,

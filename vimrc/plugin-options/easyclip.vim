@@ -1,5 +1,5 @@
 if has('nvim') || $SSH_TTY == ''
-  let &clipboard="unnamed"
+  let &clipboard="unnamed,unnamedplus"
 else
   let &clipboard=""
 endif

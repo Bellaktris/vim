@@ -51,11 +51,30 @@ if has('nvim')
     " }}}
 
     " C++ {{{
+    function! s:EigenInclude() abort
+        if executable('pkg-config')
+            let l:cflags = systemlist('pkg-config --cflags eigen3')
+            if !v:shell_error && !empty(l:cflags) && !empty(trim(l:cflags[0]))
+                return split(l:cflags[0])
+            endif
+        endif
+        for l:dir in ['/opt/homebrew/include/eigen3',
+                    \ '/usr/local/include/eigen3', '/usr/include/eigen3']
+            if isdirectory(l:dir)
+                return ['-I' . l:dir]
+            endif
+        endfor
+        return []
+    endfunction
+
+    let s:cpp_extra_args = map(
+        \ ['-std=c++2c'] + s:EigenInclude() +
+        \ ['-I'.expand('~').'/.files/c++/.local/include'],
+        \ '"-extra-arg-before=" . v:val')
+
     let g:neomake_cpp_clangcheck_maker = {
         \ 'exe': 'clang-check',
-        \ 'args': ['-extra-arg-before=-std=c++2c',
-        \          '-extra-arg-before=-I/usr/local/include/Eigen',
-        \          '-extra-arg-before=-I'.expand('~').'/.files/c++/.local/include'],
+        \ 'args': copy(s:cpp_extra_args),
         \ 'errorformat':
             \ '%-G%f:%s:,' .
             \ '%f:%l:%c: %trror: %m,' .
@@ -71,9 +90,7 @@ if has('nvim')
 
     let g:neomake_cpp_clangtidy_maker = {
         \ 'exe': 'clang-tidy',
-        \ 'args': ['-extra-arg-before=-std=c++2c',
-        \          '-extra-arg-before=-I/usr/local/include/Eigen',
-        \          '-extra-arg-before=-I'.expand('~').'/.files/c++/.local/include'],
+        \ 'args': copy(s:cpp_extra_args),
         \ 'errorformat':
             \ '%E%f:%l:%c: fatal error: %m,' .
             \ '%E%f:%l:%c: error: %m,' .
@@ -143,7 +160,8 @@ if has('nvim')
 
     let g:neomake_python_flake8_maker = {
         \ 'exe': 'flake8',
-        \ 'args': [],
+        \ 'args': ['--append-config',
+        \          expand('~/.files/python/.config/flake8')],
         \ 'errorformat':
             \ '%E%f:%l: could not compile,%-Z%p^,' .
             \ '%A%f:%l:%c: %t%n %m,' .

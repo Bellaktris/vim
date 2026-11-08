@@ -1,5 +1,26 @@
 import os
+import subprocess
 import ycm_core
+
+
+def eigen_flags():
+    try:
+        proc = subprocess.run(['pkg-config', '--cflags', 'eigen3'],
+                              capture_output=True, text=True)
+        if proc.returncode == 0 and proc.stdout.strip():
+            return proc.stdout.split()
+    except OSError:
+        pass
+
+    for path in ['/opt/homebrew/include/eigen3', '/usr/local/include/eigen3',
+                 '/usr/include/eigen3']:
+        if os.path.isdir(path):
+            return ['-I' + path]
+
+    return []
+
+
+EIGEN_FLAGS = eigen_flags()
 
 def follow_paths(flags, working_directory):
     if not working_directory:
@@ -56,8 +77,7 @@ def get_compilation_info_for_file(database, filename):
 
 def FlagsForFile(filename, **kwargs):
     current_dir = os.getcwd()
-    flags = ['-Wall', '-fexceptions', '-std=c++2c',
-             '-I/usr/local/include/eigen3',
+    flags = ['-Wall', '-fexceptions', '-std=c++2c'] + EIGEN_FLAGS + [
              '-I' + os.path.expanduser('~/.files/c++/.local/include')]
 
     if not os.path.exists(current_dir + '/compile_commands.json'):

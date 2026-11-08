@@ -204,7 +204,7 @@ call plug#begin(g:vim_plug_dir)
 
   Plug 'https://github.com/junegunn/fzf',
     \ { 'dir': '~/.fzf',
-    \   'do': './install --64 --key-bindings --completion --no-update-rc' }
+    \   'do': { -> fzf#install() } }
 
   Plug 'https://github.com/junegunn/fzf.vim'
 
