@@ -55,11 +55,19 @@ open(VIMRCDIR + '/secret.vim', 'a').close()
 XDG_NVIM = HOME + '/.config/nvim'
 os.makedirs(XDG_NVIM, exist_ok=True)
 
-with open(HOME + '/.vimrc', 'w') as f:
-    f.write(VIMRC)
 
-with open(XDG_NVIM + '/init.vim', 'w') as f:
-    f.write('source $HOME/.vimrc\n')
+def write_config(path, text):
+    """Write path, unless it is a link - the dotfiles' install script stows
+    its own bootstrap there, and writing would go through into that repo."""
+    if os.path.islink(path):
+        print(f'{path} is a link to {os.path.realpath(path)}, leaving it')
+        return
+    with open(path, 'w') as f:
+        f.write(text)
+
+
+write_config(HOME + '/.vimrc', VIMRC)
+write_config(XDG_NVIM + '/init.vim', 'source $HOME/.vimrc\n')
 
 AUTOINSTALL = "exec 'PlugInstall | UpdateRemotePlugins' | exec 'qa'"
 
