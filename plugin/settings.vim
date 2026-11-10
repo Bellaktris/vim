@@ -166,3 +166,12 @@ if !has('nvim')
 else
     execute 'set viminfo+=n'.g:temp_dir.'/nviminfo'
 endif
+
+
+" Russian keyboard (ЙЦУКЕН): normal-mode commands work without switching
+" back - each Cyrillic key acts as the Latin key in the same place. Insert
+" mode and the command line still type Cyrillic.
+let &langmap = 'ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,'
+      \ . 'фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz,'
+      \ . 'х[,ъ],ж\;,э'',б\,,ю.,Х{,Ъ},Ж:,Э\",Б<,Ю>,ё`,Ё~'
+if exists('+langremap') | set nolangremap | endif
